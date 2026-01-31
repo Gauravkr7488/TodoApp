@@ -18,15 +18,28 @@ export async function initDB() {
       name TEXT NOT NULL,
       description TEXT,
       value INTEGER NOT NULL,
+      doneStatus INTEGER NOT NULL DEFAULT 0,
       created_at INTEGER NOT NULL
-    );
+      
+      );
+      
+      ALTER TABLE tasks ADD COLUMN doneStatus INTEGER NOT NULL DEFAULT 0;
   `);
+}
+
+export async function toggleDoneStatus(taskId: number, doneStatus: boolean) {
+  const database = await getDB();
+  return database.runAsync(
+    `UPDATE tasks SET doneStatus = ? WHERE id = ?`,
+    doneStatus ? 1 : 0,
+    taskId,
+  );
 }
 
 export async function insertTask(
   name: string,
   description: string,
-  value: number
+  value: number,
 ) {
   const database = await getDB();
   return database.runAsync(
@@ -35,13 +48,13 @@ export async function insertTask(
     name,
     description,
     value,
-    Date.now()
+    Date.now(),
   );
 }
 
 export async function getTasks() {
   const database = await getDB();
   return database.getAllAsync(
-    "SELECT id, name FROM tasks ORDER BY created_at DESC"
+    "SELECT id, name, doneStatus FROM tasks ORDER BY created_at DESC",
   );
 }

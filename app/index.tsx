@@ -1,13 +1,20 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { FlatList, Text, View, StyleSheet } from "react-native";
-import { FAB } from "react-native-paper";
-import { initDB, getTasks } from "../db/db";
+import { FAB, Checkbox } from "react-native-paper";
+import { initDB, getTasks, toggleDoneStatus } from "../db/db";
 
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<any[]>([]);
   const [dbReady, setDbReady] = useState(false);
+
+  const onToggle = async (item: any) => {
+    await toggleDoneStatus(item.id, !item.status);
+    setTasks((prev) =>
+      prev.map((t) => (t.id === item.id ? { ...t, status: !t.status } : t)),
+    );
+  };
 
   // Ensure DB is ready on focus
   useFocusEffect(
@@ -29,7 +36,7 @@ export default function Index() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
@@ -38,7 +45,15 @@ export default function Index() {
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Text style={styles.item}>{item.name}</Text>
+          <View style={styles.row}>
+            <Checkbox
+              status={item.status ? "checked" : "unchecked"}
+              onPress={() => onToggle(item)}
+            />
+            <Text style={[styles.item, item.status && styles.done]}>
+              {item.name}
+            </Text>
+          </View>
         )}
         ListEmptyComponent={
           <Text style={styles.empty}>No tasks yet. Add one!</Text>
@@ -77,5 +92,13 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 16,
     backgroundColor: "#22c55e",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  done: {
+    textDecorationLine: "line-through",
+    color: "#999",
   },
 });
