@@ -9,10 +9,20 @@ export default function Index() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [dbReady, setDbReady] = useState(false);
 
+  const sortTasks = (rows: any[]) =>
+    [...rows].sort((a, b) => a.doneStatus - b.doneStatus);
+
   const onToggle = async (item: any) => {
-    await toggleDoneStatus(item.id, !item.status);
+    const newStatus = item.doneStatus === 0 ? 1 : 0;
+
+    await toggleDoneStatus(item.id, newStatus === 1);
+
     setTasks((prev) =>
-      prev.map((t) => (t.id === item.id ? { ...t, status: !t.status } : t)),
+      sortTasks(
+        prev.map((t) =>
+          t.id === item.id ? { ...t, doneStatus: newStatus } : t,
+        ),
+      ),
     );
   };
 
@@ -27,7 +37,7 @@ export default function Index() {
 
         if (isActive) {
           const rows = await getTasks();
-          setTasks(rows);
+          setTasks(sortTasks(rows));
         }
       }
 
@@ -47,10 +57,10 @@ export default function Index() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Checkbox
-              status={item.status ? "checked" : "unchecked"}
+              status={item.doneStatus ? "checked" : "unchecked"}
               onPress={() => onToggle(item)}
             />
-            <Text style={[styles.item, item.status && styles.done]}>
+            <Text style={[styles.item, item.doneStatus && styles.done]}>
               {item.name}
             </Text>
           </View>
