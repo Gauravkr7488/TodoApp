@@ -57,3 +57,8 @@ export async function getTasks() {
     "SELECT id, name, doneStatus FROM tasks ORDER BY created_at DESC",
   );
 }
+
+export async function deleteCompletedTasks() {
+  const database = await getDB();
+  return database.runAsync(`DELETE FROM tasks WHERE doneStatus = 1`);
+}

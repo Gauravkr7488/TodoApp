@@ -2,12 +2,23 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { FlatList, Text, View, StyleSheet } from "react-native";
 import { FAB, Checkbox } from "react-native-paper";
-import { initDB, getTasks, toggleDoneStatus } from "../db/db";
+import {
+  initDB,
+  getTasks,
+  toggleDoneStatus,
+  deleteCompletedTasks,
+} from "../db/db";
 
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<any[]>([]);
   const [dbReady, setDbReady] = useState(false);
+
+  const clearCompleted = async () => {
+    await deleteCompletedTasks();
+    const rows = await getTasks();
+    setTasks(sortTasks(rows));
+  };
 
   const sortTasks = (rows: any[]) =>
     [...rows].sort((a, b) => a.doneStatus - b.doneStatus);
@@ -68,6 +79,13 @@ export default function Index() {
         ListEmptyComponent={
           <Text style={styles.empty}>No tasks yet. Add one!</Text>
         }
+      />
+      <FAB
+        icon="delete"
+        label="Clear Completed"
+        onPress={clearCompleted}
+        style={[styles.fab, { bottom: 80 }]} // move above the Add button
+        disabled={!dbReady}
       />
 
       <FAB
