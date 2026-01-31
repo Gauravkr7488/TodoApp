@@ -22,7 +22,7 @@ const Add_tasks = () => {
 
   const saveTask = async () => {
     if (!dbReady) return; // wait for DB
-    if (!name || !value) return alert("Name and value are required");
+    if (!name) return alert("Name required");
 
     const numericValue = parseInt(value) || 0;
     await insertTask(name, description, numericValue);
