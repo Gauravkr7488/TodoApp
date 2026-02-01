@@ -124,3 +124,27 @@ export async function resetDB() {
   `);
   await initDB();
 }
+
+export async function unarchiveRoutines() {
+  const db = await getDB();
+
+  const today = new Date();
+  const day = today.toLocaleDateString("en-US", { weekday: "short" }); // Mon, Tue…
+
+  // daily
+  await db.runAsync(`
+    UPDATE tasks
+    SET archiveStatus = 0, doneStatus = 0
+    WHERE is_routine = 1
+      AND frequency = 'daily'
+  `);
+
+  // weekly
+  await db.runAsync(`
+    UPDATE tasks
+    SET archiveStatus = 0, doneStatus = 0
+    WHERE is_routine = 1
+      AND frequency = 'weekly'
+      AND days LIKE '%' || ? || '%'
+  `, day);
+}

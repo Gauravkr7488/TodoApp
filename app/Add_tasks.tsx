@@ -6,6 +6,7 @@ import { initDB, insertTask } from "../db/db";
 
 const Add_tasks = () => {
   const router = useRouter();
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   // common
   const [name, setName] = useState("");
@@ -46,8 +47,6 @@ const Add_tasks = () => {
 
     router.back();
   };
-
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const toggleDay = (day: string) => {
     setDays((prev) =>
@@ -109,13 +108,20 @@ const Add_tasks = () => {
             </Chip>
           </View>
 
-          <TextInput
-            label="Days (mon,tue,…)"
-            mode="outlined"
-            value={days}
-            onChangeText={setDays}
-            style={styles.input}
-          />
+          {frequency === "weekly" && (
+            <View style={styles.chipRow}>
+              {DAYS.map((day) => (
+                <Chip
+                  key={day}
+                  selected={days.includes(day)}
+                  onPress={() => toggleDay(day)}
+                >
+                  {day}
+                </Chip>
+              ))}
+            </View>
+          )}
+          
           <TextInput
             label="Start Time (HH:MM)"
             mode="outlined"

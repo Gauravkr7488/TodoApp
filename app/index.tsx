@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, View, StyleSheet, Alert } from "react-native";
 import { FAB, Checkbox } from "react-native-paper";
 import {
@@ -8,12 +8,17 @@ import {
   toggleDoneStatus,
   archiveCompletedTasks,
   resetDB,
+  unarchiveRoutines,
 } from "../db/db";
 
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<any[]>([]);
   const [dbReady, setDbReady] = useState(false);
+
+  useEffect(() => {
+    unarchiveRoutines();
+  }, []);
 
   const clearCompleted = async () => {
     await archiveCompletedTasks();
@@ -66,23 +71,23 @@ export default function Index() {
     setTasks(rows);
   };
 
-const handleReset = () => {
-  Alert.alert(
-    "Reset everything?",
-    "This will delete all tasks and routines.",
-    [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Reset",
-        style: "destructive",
-        onPress: async () => {
-          await resetDB();
-          await refreshTasks();
+  const handleReset = () => {
+    Alert.alert(
+      "Reset everything?",
+      "This will delete all tasks and routines.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          style: "destructive",
+          onPress: async () => {
+            await resetDB();
+            await refreshTasks();
+          },
         },
-      },
-    ],
-  );
-};
+      ],
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -111,7 +116,6 @@ const handleReset = () => {
         onLongPress={handleReset}
         style={[styles.fab, { bottom: 80 }]}
         disabled={!dbReady}
-        
       />
 
       <FAB
