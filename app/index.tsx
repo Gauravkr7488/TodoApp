@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Text, View, StyleSheet, Alert } from "react-native";
+import { FlatList, Text, View, StyleSheet, Alert, Pressable } from "react-native";
 import { FAB, Checkbox } from "react-native-paper";
 import {
   initDB,
@@ -100,9 +100,15 @@ export default function Index() {
               status={item.doneStatus ? "checked" : "unchecked"}
               onPress={() => onToggle(item)}
             />
-            <Text style={[styles.item, item.doneStatus && styles.done]}>
-              {item.name}
-            </Text>
+            <Pressable
+              onPress={() =>
+                router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+              }
+            >
+              <Text style={[styles.item, item.doneStatus && styles.done]}>
+                {item.name}
+              </Text>
+            </Pressable>
           </View>
         )}
         ListEmptyComponent={

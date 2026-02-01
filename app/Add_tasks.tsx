@@ -2,11 +2,14 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Switch, Text } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import { initDB, insertTask } from "../db/db";
+import { getDB, initDB, insertTask } from "../db/db";
+import { useSearchParams } from "expo-router/build/hooks";
 
 const Add_tasks = () => {
   const router = useRouter();
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const params = useSearchParams();
+  const id = params.get("id");
 
   // common
   const [name, setName] = useState("");
@@ -26,24 +29,70 @@ const Add_tasks = () => {
     (async () => {
       await initDB();
       setDbReady(true);
+
+      if (id) {
+        const db = await getDB();
+        const rows = await db.getAllAsync(
+          "SELECT * FROM tasks WHERE id = ?",
+          Number(id),
+        );
+        if (rows.length) {
+          const task: any = rows[0];
+          setName(task.name);
+          setDescription(task.description || "");
+          setValue(task.value?.toString() || "0");
+          setIsRoutine(task.is_routine === 1);
+          setFrequency(task.frequency || "");
+          setDays(task.days || "");
+          setStartTime(task.start_time || "");
+          setEndTime(task.end_time || "");
+          setIsActive(task.is_active !== 0);
+        }
+      }
     })();
-  }, []);
+  }, [id]);
 
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
 
-    await insertTask(
-      name.trim(),
-      description || null,
-      parseInt(value) || 9,
-      0, // doneStatus
-      isRoutine ? 1 : 0,
-      isRoutine ? frequency || null : null,
-      isRoutine ? days || null : null,
-      isRoutine ? startTime || null : null,
-      isRoutine ? endTime || null : null,
-      isRoutine ? (isActive ? 1 : 0) : null,
-    );
+    const numericValue = parseInt(value) || 9;
+
+    const db = await getDB();
+
+    if (id) {
+      // UPDATE existing task
+      await db.runAsync(
+        `UPDATE tasks SET 
+        name = ?, description = ?, value = ?, 
+        is_routine = ?, frequency = ?, days = ?, 
+        start_time = ?, end_time = ?, is_active = ? 
+       WHERE id = ?`,
+        name.trim(),
+        description || null,
+        numericValue,
+        isRoutine ? 1 : 0,
+        isRoutine ? frequency || null : null,
+        isRoutine ? days || null : null,
+        isRoutine ? startTime || null : null,
+        isRoutine ? endTime || null : null,
+        isRoutine ? (isActive ? 1 : 0) : null,
+        Number(id),
+      );
+    } else {
+      // INSERT new task
+      await insertTask(
+        name.trim(),
+        description || null,
+        numericValue,
+        0, // doneStatus
+        isRoutine ? 1 : 0,
+        isRoutine ? frequency || null : null,
+        isRoutine ? days || null : null,
+        isRoutine ? startTime || null : null,
+        isRoutine ? endTime || null : null,
+        isRoutine ? (isActive ? 1 : 0) : null,
+      );
+    }
 
     router.back();
   };
@@ -121,7 +170,7 @@ const Add_tasks = () => {
               ))}
             </View>
           )}
-          
+
           <TextInput
             label="Start Time (HH:MM)"
             mode="outlined"
