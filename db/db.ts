@@ -62,3 +62,12 @@ export async function deleteCompletedTasks() {
   const database = await getDB();
   return database.runAsync(`DELETE FROM tasks WHERE doneStatus = 1`);
 }
+
+export async function resetDB() {
+  const database = await getDB();
+  await database.execAsync(`
+    DROP TABLE IF EXISTS tasks;
+    DROP TABLE IF EXISTS routines;
+  `);
+  await initDB();
+}
