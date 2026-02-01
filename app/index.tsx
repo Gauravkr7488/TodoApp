@@ -82,7 +82,7 @@ export default function Index() {
       />
       <FAB
         icon="delete"
-        label="Clear Completed"
+        label="Clear"
         onPress={clearCompleted}
         style={[styles.fab, { bottom: 80 }]} // move above the Add button
         disabled={!dbReady}
