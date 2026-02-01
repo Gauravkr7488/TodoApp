@@ -7,8 +7,7 @@ const Add = () => {
     return (
         <View>
             <FAB label="task" onPress={() => router.push("./Add_tasks")}/>            
-            <FAB label="routine" onPress={() => router.push("./Add_routine")}/>            
-            <FAB label="reset" onPress={() => router.push("./resetDB")}/>            
+            <FAB label="reset" onPress={() => router.push("./resetDb")}/>            
         </View>
     );
 };

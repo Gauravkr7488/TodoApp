@@ -13,17 +13,30 @@ export async function initDB() {
   const database = await getDB();
   await database.execAsync(`
     PRAGMA journal_mode = WAL;
+
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       description TEXT,
+
+      -- task fields
       value INTEGER NOT NULL DEFAULT 9,
       doneStatus INTEGER NOT NULL DEFAULT 0,
+
+      -- routine fields (NULL = normal task)
+      is_routine INTEGER NOT NULL DEFAULT 0,
+      frequency TEXT,
+      days TEXT,
+      start_time TEXT,
+      end_time TEXT,
+      is_active INTEGER,
+
       created_at INTEGER NOT NULL
-      
-      );
-      
+    );
+
   `);
+
+  await database.execAsync(``);
 }
 
 export async function toggleDoneStatus(taskId: number, doneStatus: boolean) {
@@ -37,16 +50,46 @@ export async function toggleDoneStatus(taskId: number, doneStatus: boolean) {
 
 export async function insertTask(
   name: string,
-  description: string,
-  value: number,
+  description: string | null = null,
+
+  // task fields
+  value: number = 9,
+  doneStatus: number = 0,
+
+  // routine fields
+  is_routine: number = 0,
+  frequency: string | null = null,
+  days: string | null = null,
+  start_time: string | null = null,
+  end_time: string | null = null,
+  is_active: number | null = null,
 ) {
   const database = await getDB();
   return database.runAsync(
-    `INSERT INTO tasks (name, description, value, created_at)
-     VALUES (?, ?, ?, ?)`,
+    `INSERT INTO tasks (
+      name,
+      description,
+      value,
+      doneStatus,
+      is_routine,
+      frequency,
+      days,
+      start_time,
+      end_time,
+      is_active,
+      created_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     name,
     description,
     value,
+    doneStatus,
+    is_routine,
+    frequency,
+    days,
+    start_time,
+    end_time,
+    is_active,
     Date.now(),
   );
 }

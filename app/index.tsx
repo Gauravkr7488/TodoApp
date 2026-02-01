@@ -1,12 +1,13 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { FlatList, Text, View, StyleSheet } from "react-native";
+import { FlatList, Text, View, StyleSheet, Alert } from "react-native";
 import { FAB, Checkbox } from "react-native-paper";
 import {
   initDB,
   getTasks,
   toggleDoneStatus,
   deleteCompletedTasks,
+  resetDB,
 } from "../db/db";
 
 export default function Index() {
@@ -17,10 +18,10 @@ export default function Index() {
   const clearCompleted = async () => {
     await deleteCompletedTasks();
     const rows = await getTasks();
-    setTasks(sortTasks(rows));
+    setTasks(sortDoneTasks(rows));
   };
 
-  const sortTasks = (rows: any[]) =>
+  const sortDoneTasks = (rows: any[]) =>
     [...rows].sort((a, b) => a.doneStatus - b.doneStatus);
 
   const onToggle = async (item: any) => {
@@ -29,7 +30,7 @@ export default function Index() {
     await toggleDoneStatus(item.id, newStatus === 1);
 
     setTasks((prev) =>
-      sortTasks(
+      sortDoneTasks(
         prev.map((t) =>
           t.id === item.id ? { ...t, doneStatus: newStatus } : t,
         ),
@@ -48,7 +49,7 @@ export default function Index() {
 
         if (isActive) {
           const rows = await getTasks();
-          setTasks(sortTasks(rows));
+          setTasks(sortDoneTasks(rows));
         }
       }
 
@@ -59,6 +60,29 @@ export default function Index() {
       };
     }, []),
   );
+
+  const refreshTasks = async () => {
+    const rows = await getTasks();
+    setTasks(rows);
+  };
+
+const handleReset = () => {
+  Alert.alert(
+    "Reset everything?",
+    "This will delete all tasks and routines.",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: async () => {
+          await resetDB();
+          await refreshTasks();
+        },
+      },
+    ],
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -84,14 +108,16 @@ export default function Index() {
         icon="delete"
         label="Clear"
         onPress={clearCompleted}
-        style={[styles.fab, { bottom: 80 }]} // move above the Add button
+        onLongPress={handleReset}
+        style={[styles.fab, { bottom: 80 }]}
         disabled={!dbReady}
+        
       />
 
       <FAB
         icon="plus"
         label="Add"
-        onPress={() => router.push("./add")}
+        onPress={() => router.push("./Add_tasks")}
         style={styles.fab}
         disabled={!dbReady} // prevent pressing before DB ready
       />
