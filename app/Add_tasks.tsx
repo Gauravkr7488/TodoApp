@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Switch, Text } from "react-native";
-import { FAB, TextInput } from "react-native-paper";
+import { Chip, FAB, TextInput } from "react-native-paper";
 import { initDB, insertTask } from "../db/db";
 
 const Add_tasks = () => {
@@ -47,11 +47,45 @@ const Add_tasks = () => {
     router.back();
   };
 
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const toggleDay = (day: string) => {
+    setDays((prev) =>
+      prev.includes(day)
+        ? prev
+            .split(",")
+            .filter((d) => d !== day)
+            .join(",")
+        : prev
+          ? `${prev},${day}`
+          : day,
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <TextInput label="Name" mode="outlined" value={name} onChangeText={setName} style={styles.input} />
-      <TextInput label="Description" mode="outlined" value={description} onChangeText={setDescription} style={styles.input} />
-      <TextInput label="Value" mode="outlined" value={value} onChangeText={setValue} keyboardType="numeric" style={styles.input} />
+      <TextInput
+        label="Name"
+        mode="outlined"
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
+      />
+      <TextInput
+        label="Description"
+        mode="outlined"
+        value={description}
+        onChangeText={setDescription}
+        style={styles.input}
+      />
+      <TextInput
+        label="Value"
+        mode="outlined"
+        value={value}
+        onChangeText={setValue}
+        keyboardType="numeric"
+        style={styles.input}
+      />
 
       <View style={styles.switchRow}>
         <Text>Is Routine</Text>
@@ -60,10 +94,42 @@ const Add_tasks = () => {
 
       {isRoutine && (
         <>
-          <TextInput label="Frequency (daily / weekly)" mode="outlined" value={frequency} onChangeText={setFrequency} style={styles.input} />
-          <TextInput label="Days (mon,tue,…)" mode="outlined" value={days} onChangeText={setDays} style={styles.input} />
-          <TextInput label="Start Time (HH:MM)" mode="outlined" value={startTime} onChangeText={setStartTime} style={styles.input} />
-          <TextInput label="End Time (HH:MM)" mode="outlined" value={endTime} onChangeText={setEndTime} style={styles.input} />
+          <View style={styles.chipRow}>
+            <Chip
+              selected={frequency === "daily"}
+              onPress={() => setFrequency("daily")}
+            >
+              Daily
+            </Chip>
+            <Chip
+              selected={frequency === "weekly"}
+              onPress={() => setFrequency("weekly")}
+            >
+              Weekly
+            </Chip>
+          </View>
+
+          <TextInput
+            label="Days (mon,tue,…)"
+            mode="outlined"
+            value={days}
+            onChangeText={setDays}
+            style={styles.input}
+          />
+          <TextInput
+            label="Start Time (HH:MM)"
+            mode="outlined"
+            value={startTime}
+            onChangeText={setStartTime}
+            style={styles.input}
+          />
+          <TextInput
+            label="End Time (HH:MM)"
+            mode="outlined"
+            value={endTime}
+            onChangeText={setEndTime}
+            style={styles.input}
+          />
 
           <View style={styles.switchRow}>
             <Text>Active</Text>
@@ -97,6 +163,12 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 16,
     backgroundColor: "#22c55e",
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 12,
   },
 });
 
