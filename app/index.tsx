@@ -6,7 +6,7 @@ import {
   initDB,
   getTasks,
   toggleDoneStatus,
-  deleteCompletedTasks,
+  archiveCompletedTasks,
   resetDB,
 } from "../db/db";
 
@@ -16,7 +16,7 @@ export default function Index() {
   const [dbReady, setDbReady] = useState(false);
 
   const clearCompleted = async () => {
-    await deleteCompletedTasks();
+    await archiveCompletedTasks();
     const rows = await getTasks();
     setTasks(sortDoneTasks(rows));
   };

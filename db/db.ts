@@ -22,6 +22,7 @@ export async function initDB() {
       -- task fields
       value INTEGER NOT NULL DEFAULT 9,
       doneStatus INTEGER NOT NULL DEFAULT 0,
+      archiveStatus INTEGER NOT NULL DEFAULT 0,
 
       -- routine fields (NULL = normal task)
       is_routine INTEGER NOT NULL DEFAULT 0,
@@ -97,14 +98,23 @@ export async function insertTask(
 export async function getTasks() {
   const database = await getDB();
   return database.getAllAsync(
-    "SELECT id, name, doneStatus FROM tasks ORDER BY created_at DESC",
+    `SELECT id, name, doneStatus
+     FROM tasks
+     WHERE archiveStatus = 0
+     ORDER BY created_at DESC`
   );
 }
 
-export async function deleteCompletedTasks() {
+
+export async function archiveCompletedTasks() {
   const database = await getDB();
-  return database.runAsync(`DELETE FROM tasks WHERE doneStatus = 1`);
+  return database.runAsync(
+    `UPDATE tasks
+     SET archiveStatus = 1
+     WHERE doneStatus = 1 AND archiveStatus = 0`
+  );
 }
+
 
 export async function resetDB() {
   const database = await getDB();
