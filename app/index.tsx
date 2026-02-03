@@ -8,8 +8,8 @@ import {
   toggleDoneStatus,
   archiveCompletedTasks,
   resetDB,
-  unarchiveRoutines,
 } from "../db/db";
+import { unarchiveRoutines } from "@/db/routines";
 
 export default function Index() {
   const router = useRouter();

@@ -101,20 +101,18 @@ export async function getTasks() {
     `SELECT id, name, doneStatus
      FROM tasks
      WHERE archiveStatus = 0
-     ORDER BY created_at DESC`
+     ORDER BY created_at DESC`,
   );
 }
-
 
 export async function archiveCompletedTasks() {
   const database = await getDB();
   return database.runAsync(
     `UPDATE tasks
      SET archiveStatus = 1
-     WHERE doneStatus = 1 AND archiveStatus = 0`
+     WHERE doneStatus = 1 AND archiveStatus = 0`,
   );
 }
-
 
 export async function resetDB() {
   const database = await getDB();
@@ -125,26 +123,30 @@ export async function resetDB() {
   await initDB();
 }
 
-export async function unarchiveRoutines() {
+export async function unarchiveDailyRoutines() {
   const db = await getDB();
 
-  const today = new Date();
-  const day = today.toLocaleDateString("en-US", { weekday: "short" }); // Mon, Tue…
-
-  // daily
   await db.runAsync(`
-    UPDATE tasks
-    SET archiveStatus = 0, doneStatus = 0
-    WHERE is_routine = 1
-      AND frequency = 'daily'
+  UPDATE tasks
+  SET archiveStatus = 0, doneStatus = 0
+  WHERE is_routine = 1
+    AND frequency = 'daily'
   `);
+}
 
-  // weekly
-  await db.runAsync(`
+export async function unarchiveWeeklyRoutines() {
+  const db = await getDB();
+  const today = new Date();
+  const day = today.toLocaleDateString("en-US", { weekday: "short" }); // Mon
+
+  await db.runAsync(
+    `
     UPDATE tasks
     SET archiveStatus = 0, doneStatus = 0
     WHERE is_routine = 1
       AND frequency = 'weekly'
-      AND days LIKE '%' || ? || '%'
-  `, day);
+      AND days LIKE ?
+    `,
+    `%${day}%`,
+  );
 }
