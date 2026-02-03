@@ -150,3 +150,12 @@ export async function unarchiveWeeklyRoutines() {
     `%${day}%`,
   );
 }
+
+export async function deleteTaskFromTable(id: number) {
+  const db = await getDB();
+
+  await db.runAsync(
+    `DELETE FROM tasks WHERE id = ?`,
+    id
+  );
+}

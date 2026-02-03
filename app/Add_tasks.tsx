@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Switch, Text } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import { getDB, initDB, insertTask } from "../db/db";
+import { deleteTaskFromTable, getDB, initDB, insertTask } from "../db/db";
 import { useSearchParams } from "expo-router/build/hooks";
 
 const Add_tasks = () => {
@@ -122,6 +122,12 @@ const Add_tasks = () => {
     );
   };
 
+  const deleteTask = () => {
+    if (!id) return;
+    deleteTaskFromTable(Number(id));
+    router.back();
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -204,6 +210,13 @@ const Add_tasks = () => {
             <Switch value={isActive} onValueChange={setIsActive} />
           </View>
         </>
+      )}
+      {id && (
+        <FAB
+          icon="delete"
+          onPress={deleteTask}
+          style={[styles.fab, { bottom: 80, backgroundColor: "#ef4444" }]}
+        />
       )}
 
       <FAB
