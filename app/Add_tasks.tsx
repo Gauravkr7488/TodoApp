@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Switch, Text } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
 import { getDB, initDB, insertTask } from "../db/db";
@@ -24,6 +24,18 @@ const Add_tasks = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [isActive, setIsActive] = useState(true);
+
+  // other stuff
+  const inputRef = useRef<any>(null);
+
+  // useEffects
+  useEffect(() => {
+    const t = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 300); // will not work without the timeout
+
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -115,6 +127,7 @@ const Add_tasks = () => {
       <TextInput
         label="Name"
         mode="outlined"
+        ref={inputRef}
         value={name}
         onChangeText={setName}
         style={styles.input}
