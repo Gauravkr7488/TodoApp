@@ -1,3 +1,4 @@
+import { STRINGS } from "@/Constants/strings";
 import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
@@ -95,13 +96,15 @@ export async function insertTask(
   );
 }
 
-export async function getTasks() {
+export async function getTasks(filters: string[] = []) {
   const database = await getDB();
+  const archiveStatus = filters.includes(STRINGS.archived) ? 1 : 0;
   return database.getAllAsync(
     `SELECT id, name, doneStatus
      FROM tasks
-     WHERE archiveStatus = 0
+     WHERE archiveStatus = ?
      ORDER BY created_at DESC`,
+    archiveStatus,
   );
 }
 
@@ -154,8 +157,5 @@ export async function unarchiveWeeklyRoutines() {
 export async function deleteTaskFromTable(id: number) {
   const db = await getDB();
 
-  await db.runAsync(
-    `DELETE FROM tasks WHERE id = ?`,
-    id
-  );
+  await db.runAsync(`DELETE FROM tasks WHERE id = ?`, id);
 }
