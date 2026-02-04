@@ -1,5 +1,6 @@
 import { STRINGS } from "@/Constants/strings";
 import { getTasks } from "@/db/db";
+import { filterTasks } from "@/db/filter";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Pressable, Text } from "react-native";
@@ -10,9 +11,11 @@ export default function TaskPage() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [text, setText] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const searchFilters = [STRINGS.archived, STRINGS.routine];
+
 
   const refreshTasks = async (activeFilters: string[]) => {
-    const tasks = await getTasks(activeFilters);
+    const tasks = await filterTasks(activeFilters);
     setTasks(tasks);
   };
   useEffect(() => {
@@ -35,7 +38,6 @@ export default function TaskPage() {
     });
   };
 
-  const searchFilters = [STRINGS.archived];
 
   return (
     <View style={styles.container}>
