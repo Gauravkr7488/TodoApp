@@ -1,3 +1,6 @@
 export const STRINGS = {
-    archived: "Archived"
+    archived: "Archived",
+    daily: "Daily",
+    weekly: "Weekly",
+    routine: "Routine",
 }
