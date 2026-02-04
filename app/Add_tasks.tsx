@@ -24,7 +24,7 @@ const Add_tasks = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [isActive, setIsActive] = useState(true);
-
+  const [isArchived, setIsArcived] = useState(false);
   // other stuff
   const inputRef = useRef<any>(null);
 
@@ -59,6 +59,7 @@ const Add_tasks = () => {
           setStartTime(task.start_time || "");
           setEndTime(task.end_time || "");
           setIsActive(task.is_active !== 0);
+          setIsArcived(task.archiveStatus === 1);
         }
       }
     })();
@@ -77,7 +78,8 @@ const Add_tasks = () => {
         `UPDATE tasks SET 
         name = ?, description = ?, value = ?, 
         is_routine = ?, frequency = ?, days = ?, 
-        start_time = ?, end_time = ?, is_active = ? 
+        start_time = ?, end_time = ?, is_active = ? ,
+        archiveStatus = ?
        WHERE id = ?`,
         name.trim(),
         description || null,
@@ -88,6 +90,7 @@ const Add_tasks = () => {
         isRoutine ? startTime || null : null,
         isRoutine ? endTime || null : null,
         isRoutine ? (isActive ? 1 : 0) : null,
+        isArchived ? 1 : 0,
         Number(id),
       );
     } else {
@@ -204,6 +207,11 @@ const Add_tasks = () => {
             onChangeText={setEndTime}
             style={styles.input}
           />
+          
+          <View style={styles.switchRow}>
+            <Text>Is Archived</Text>
+            <Switch value={isArchived} onValueChange={setIsArcived} />
+          </View>
 
           <View style={styles.switchRow}>
             <Text>Active</Text>
