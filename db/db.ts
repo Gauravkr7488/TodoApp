@@ -98,13 +98,10 @@ export async function insertTask(
 
 export async function getTasks(filters: string[] = []) {
   const database = await getDB();
-  const archiveStatus = filters.includes(STRINGS.archived) ? 1 : 0;
   return database.getAllAsync(
     `SELECT id, name, doneStatus
      FROM tasks
-     WHERE archiveStatus = ?
      ORDER BY created_at DESC`,
-    archiveStatus,
   );
 }
 
