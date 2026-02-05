@@ -24,7 +24,11 @@ export default function Index() {
   const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
-    unarchiveRoutines();
+    const run = async () => {
+      await unarchiveRoutines();
+    };
+
+    run();
   }, []);
 
   const clearCompleted = async () => {
