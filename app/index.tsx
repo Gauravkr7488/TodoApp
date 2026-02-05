@@ -1,15 +1,22 @@
+import { unarchiveRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Text, View, StyleSheet, Alert, Pressable } from "react-native";
-import { FAB, Checkbox } from "react-native-paper";
 import {
-  initDB,
-  getTasks,
-  toggleDoneStatus,
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { Checkbox, FAB } from "react-native-paper";
+import {
   archiveCompletedTasks,
+  getUnarchivedTasks,
+  initDB,
   resetDB,
+  toggleDoneStatus,
 } from "../db/db";
-import { unarchiveRoutines } from "@/db/routines";
 
 export default function Index() {
   const router = useRouter();
@@ -22,7 +29,9 @@ export default function Index() {
 
   const clearCompleted = async () => {
     await archiveCompletedTasks();
-    const rows = await getTasks();
+
+    const rows = await getUnarchivedTasks();
+    console.log(rows);
     setTasks(sortDoneTasks(rows));
   };
 
@@ -53,7 +62,7 @@ export default function Index() {
         setDbReady(true);
 
         if (isActive) {
-          const rows = await getTasks();
+          const rows = await getUnarchivedTasks();
           setTasks(sortDoneTasks(rows));
         }
       }
@@ -67,7 +76,7 @@ export default function Index() {
   );
 
   const refreshTasks = async () => {
-    const rows = await getTasks();
+    const rows = await getUnarchivedTasks();
     setTasks(rows);
   };
 
