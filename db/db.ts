@@ -134,11 +134,8 @@ export async function unarchiveDailyRoutines() {
   `);
 }
 
-export async function unarchiveWeeklyRoutines() {
+export async function unarchiveWeeklyRoutines(day: string) {
   const db = await getDB();
-  const today = new Date();
-  const day = today.toLocaleDateString("en-US", { weekday: "short" }); // Mon
-
   await db.runAsync(
     `
     UPDATE tasks
