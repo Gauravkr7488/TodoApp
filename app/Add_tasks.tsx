@@ -4,6 +4,7 @@ import { View, StyleSheet, Switch, Text } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
 import { deleteTaskFromTable, getDB, initDB, insertTask } from "../db/db";
 import { useSearchParams } from "expo-router/build/hooks";
+import { Frequency } from "@/Constants/type";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const Add_tasks = () => {
 
   // routine-specific
   const [isRoutine, setIsRoutine] = useState(false);
-  const [frequency, setFrequency] = useState("");
+  const [frequency, setFrequency] = useState<Frequency>("daily");
   const [days, setDays] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
