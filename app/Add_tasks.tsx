@@ -4,10 +4,12 @@ import { View, StyleSheet, Switch, Text } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
 import { deleteTaskFromTable, getDB, initDB, insertTask } from "../db/db";
 import { useSearchParams } from "expo-router/build/hooks";
+import { Frequency } from "@/Constants/type";
+import { WEEKDAYS } from "@/Constants/strings";
 
 const Add_tasks = () => {
   const router = useRouter();
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const DAYS = WEEKDAYS;
   const params = useSearchParams();
   const id = params.get("id");
 
@@ -18,8 +20,8 @@ const Add_tasks = () => {
 
   // routine-specific
   const [isRoutine, setIsRoutine] = useState(false);
-  const [frequency, setFrequency] = useState("");
-  const [days, setDays] = useState("");
+  const [frequency, setFrequency] = useState<Frequency>("daily");
+  const [days, setDays] = useState<string>("Sun");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -65,7 +67,7 @@ const Add_tasks = () => {
 
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
-
+    if (frequency == "weekly" && days == "") return alert("choose a day");
     const numericValue = parseInt(value) || 9;
 
     const db = await getDB();
@@ -205,7 +207,7 @@ const Add_tasks = () => {
             onChangeText={setEndTime}
             style={styles.input}
           />
-          
+
           <View style={styles.switchRow}>
             <Text>Is Archived</Text>
             <Switch value={isArchived} onValueChange={setIsArcived} />

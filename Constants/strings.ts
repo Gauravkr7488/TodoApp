@@ -4,3 +4,5 @@ export const STRINGS = {
     weekly: "Weekly",
     routine: "Routine",
 }
+
+export const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; 
