@@ -31,7 +31,6 @@ export default function Index() {
     await archiveCompletedTasks();
 
     const rows = await getUnarchivedTasks();
-    console.log(rows);
     setTasks(sortDoneTasks(rows));
   };
 
