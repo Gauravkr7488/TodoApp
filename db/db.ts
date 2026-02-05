@@ -1,4 +1,3 @@
-import { STRINGS } from "@/Constants/strings";
 import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
@@ -96,11 +95,12 @@ export async function insertTask(
   );
 }
 
-export async function getTasks(filters: string[] = []) {
+export async function getUnarchivedTasks() {
   const database = await getDB();
   return database.getAllAsync(
     `SELECT id, name, doneStatus
      FROM tasks
+     WHERE archiveStatus = 0
      ORDER BY created_at DESC`,
   );
 }

@@ -1,9 +1,8 @@
 import { STRINGS } from "@/Constants/strings";
-import { getTasks } from "@/db/db";
 import { filterTasks } from "@/db/filter";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Pressable, Text } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Chip, TextInput } from "react-native-paper";
 
 export default function TaskPage() {
@@ -12,7 +11,6 @@ export default function TaskPage() {
   const [text, setText] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const searchFilters = [STRINGS.archived, STRINGS.routine];
-
 
   const refreshTasks = async (activeFilters: string[]) => {
     const tasks = await filterTasks(activeFilters);
@@ -37,7 +35,6 @@ export default function TaskPage() {
       return [...previousFilters, filter];
     });
   };
-
 
   return (
     <View style={styles.container}>
