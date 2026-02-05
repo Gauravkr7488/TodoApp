@@ -231,7 +231,6 @@ const Add_tasks = () => {
         icon="content-save"
         label="Save"
         onPress={saveTask}
-        disabled={!dbReady}
         style={styles.fab}
       />
     </View>
