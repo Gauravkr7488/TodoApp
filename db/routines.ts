@@ -9,7 +9,12 @@ export async function unarchiveRoutines() {
 
   const lastRun = await AsyncStorage.getItem(UNARCHIVE_KEY);
 
-  if (!lastRun || lastRun === todayISO) return;
+  if (!lastRun) {
+    await AsyncStorage.setItem(UNARCHIVE_KEY, todayISO);
+    return;
+  }
+
+  if(lastRun === todayISO) return;
 
   await unarchiveDailyRoutines();
 
