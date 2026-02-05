@@ -21,7 +21,7 @@ const Add_tasks = () => {
   // routine-specific
   const [isRoutine, setIsRoutine] = useState(false);
   const [frequency, setFrequency] = useState<Frequency>("daily");
-  const [days, setDays] = useState("Sun");
+  const [days, setDays] = useState<string>("Sun");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -67,7 +67,7 @@ const Add_tasks = () => {
 
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
-
+    if (frequency == "weekly" && days == "") return alert("choose a day");
     const numericValue = parseInt(value) || 9;
 
     const db = await getDB();
@@ -207,7 +207,7 @@ const Add_tasks = () => {
             onChangeText={setEndTime}
             style={styles.input}
           />
-          
+
           <View style={styles.switchRow}>
             <Text>Is Archived</Text>
             <Switch value={isArchived} onValueChange={setIsArcived} />
