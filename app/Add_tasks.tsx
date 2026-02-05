@@ -15,7 +15,6 @@ const Add_tasks = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [value, setValue] = useState("");
-  const [dbReady, setDbReady] = useState(false);
 
   // routine-specific
   const [isRoutine, setIsRoutine] = useState(false);
@@ -40,7 +39,6 @@ const Add_tasks = () => {
   useEffect(() => {
     (async () => {
       await initDB();
-      setDbReady(true);
 
       if (id) {
         const db = await getDB();
