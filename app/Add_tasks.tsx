@@ -1,11 +1,16 @@
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Switch, Text } from "react-native";
-import { Chip, FAB, TextInput } from "react-native-paper";
-import { deleteTaskFromTable, getDB, initDB, insertTask } from "../db/db";
-import { useSearchParams } from "expo-router/build/hooks";
-import { Frequency } from "@/Constants/type";
 import { WEEKDAYS } from "@/Constants/strings";
+import { Frequency } from "@/Constants/type";
+import { useRouter } from "expo-router";
+import { useSearchParams } from "expo-router/build/hooks";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, Switch, Text, View } from "react-native";
+import { Chip, FAB, TextInput } from "react-native-paper";
+import {
+  deleteTaskFromTable,
+  getTask,
+  insertTask,
+  updateTask,
+} from "../db/db";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -40,15 +45,9 @@ const Add_tasks = () => {
 
   useEffect(() => {
     (async () => {
-      await initDB();
-
       if (id) {
-        const db = await getDB();
-        const rows = await db.getAllAsync(
-          "SELECT * FROM tasks WHERE id = ?",
-          Number(id),
-        );
-        if (rows.length) {
+        const rows = await getTask(id);
+        if (rows.length) { // load task
           const task: any = rows[0];
           setName(task.name);
           setDescription(task.description || "");
@@ -70,28 +69,20 @@ const Add_tasks = () => {
     if (frequency == "weekly" && days == "") return alert("choose a day");
     const numericValue = parseInt(value) || 9;
 
-    const db = await getDB();
-
     if (id) {
       // UPDATE existing task
-      await db.runAsync(
-        `UPDATE tasks SET 
-        name = ?, description = ?, value = ?, 
-        is_routine = ?, frequency = ?, days = ?, 
-        start_time = ?, end_time = ?, is_active = ? ,
-        archiveStatus = ?
-       WHERE id = ?`,
-        name.trim(),
-        description || null,
+      await updateTask(
+        name,
+        description,
         numericValue,
-        isRoutine ? 1 : 0,
-        isRoutine ? frequency || null : null,
-        isRoutine ? days || null : null,
-        isRoutine ? startTime || null : null,
-        isRoutine ? endTime || null : null,
-        isRoutine ? (isActive ? 1 : 0) : null,
-        isArchived ? 1 : 0,
-        Number(id),
+        isRoutine,
+        frequency,
+        days,
+        startTime,
+        endTime,
+        isActive,
+        isArchived,
+        id,
       );
     } else {
       // INSERT new task
