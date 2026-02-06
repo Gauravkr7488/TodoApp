@@ -2,7 +2,7 @@ import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
 
-export async function getDB() {
+async function getDB() {
   if (!db) {
     db = await SQLite.openDatabaseAsync("app.db");
   }
@@ -152,4 +152,42 @@ export async function deleteTaskFromTable(id: number) {
   const db = await getDB();
 
   await db.runAsync(`DELETE FROM tasks WHERE id = ?`, id);
+}
+export async function updateTask(
+  name: string,
+  description: string,
+  numericValue: number,
+  isRoutine: boolean,
+  frequency: string,
+  days: string,
+  startTime: string,
+  endTime: string,
+  isActive: boolean,
+  isArchived: boolean,
+  id: string,
+) {
+  const db = await getDB();
+  await db.runAsync(
+    `UPDATE tasks SET 
+        name = ?, description = ?, value = ?, 
+        is_routine = ?, frequency = ?, days = ?, 
+        start_time = ?, end_time = ?, is_active = ? ,
+        archiveStatus = ?
+       WHERE id = ?`,
+    name.trim(),
+    description || null,
+    numericValue,
+    isRoutine ? 1 : 0,
+    isRoutine ? frequency || null : null,
+    isRoutine ? days || null : null,
+    isRoutine ? startTime || null : null,
+    isRoutine ? endTime || null : null,
+    isRoutine ? (isActive ? 1 : 0) : null,
+    isArchived ? 1 : 0,
+    Number(id),
+  );
+}
+export async function getTask(id: string) {
+  const db = await getDB();
+  return await db.getAllAsync("SELECT * FROM tasks WHERE id = ?", Number(id));
 }
