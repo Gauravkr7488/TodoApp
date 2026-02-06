@@ -8,7 +8,6 @@ import { Chip, FAB, TextInput } from "react-native-paper";
 import {
   deleteTaskFromTable,
   getTask,
-  initDB,
   insertTask,
   updateTask,
 } from "../db/db";
@@ -46,11 +45,9 @@ const Add_tasks = () => {
 
   useEffect(() => {
     (async () => {
-      await initDB();
-
       if (id) {
         const rows = await getTask(id);
-        if (rows.length) {
+        if (rows.length) { // load task
           const task: any = rows[0];
           setName(task.name);
           setDescription(task.description || "");

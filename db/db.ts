@@ -9,7 +9,7 @@ async function getDB() {
   return db;
 }
 
-export async function initDB() {
+async function initDB() {
   const database = await getDB();
   await database.execAsync(`
     PRAGMA journal_mode = WAL;
