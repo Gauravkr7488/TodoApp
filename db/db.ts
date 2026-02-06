@@ -42,7 +42,7 @@ async function initDB() {
 
 export async function toggleDoneStatus(taskId: number, doneStatus: boolean) {
   const database = await getDB();
-  return database.runAsync(
+  await database.runAsync(
     `UPDATE tasks SET doneStatus = ? WHERE id = ?`,
     doneStatus ? 1 : 0,
     taskId,
@@ -66,7 +66,7 @@ export async function insertTask(
   is_active: number | null = null,
 ) {
   const database = await getDB();
-  return database.runAsync(
+  await database.runAsync(
     `INSERT INTO tasks (
       name,
       description,
@@ -107,7 +107,7 @@ export async function getUnarchivedTasks() {
 
 export async function archiveCompletedTasks() {
   const database = await getDB();
-  return database.runAsync(
+  await database.runAsync(
     `UPDATE tasks
      SET archiveStatus = 1
      WHERE doneStatus = 1 AND archiveStatus = 0`,
