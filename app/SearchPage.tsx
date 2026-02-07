@@ -1,5 +1,5 @@
 import { STRINGS } from "@/Constants/strings";
-import { filterTasks } from "@/db/filter";
+import { getFilteredTasks } from "@/db/filter";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,7 +13,7 @@ export default function TaskPage() {
   const searchFilters = [STRINGS.archived, STRINGS.routine];
 
   const refreshTasks = async (activeFilters: string[]) => {
-    const tasks = await filterTasks(activeFilters);
+    const tasks = await getFilteredTasks(activeFilters);
     setTasks(tasks);
   };
   useEffect(() => {
