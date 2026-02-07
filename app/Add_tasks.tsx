@@ -179,9 +179,9 @@ const Add_tasks = () => {
               ))}
             </View>
           )}
-          <TimePicker value={startTime} onChange={setStartTime} />
-          <TimePicker value={endTime} onChange={setEndTime} />
-          
+          <TimePicker labelProp= "Start Time" value={startTime} onChange={setStartTime} />
+          <TimePicker labelProp= "End Time" value={endTime} onChange={setEndTime} />
+
           <View style={styles.switchRow}>
             <Text>Is Archived</Text>
             <Switch value={isArchived} onValueChange={setIsArcived} />

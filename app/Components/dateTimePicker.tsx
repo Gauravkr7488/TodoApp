@@ -5,10 +5,11 @@ import { TextInput } from "react-native-paper";
 
 type Props = {
   value: string;
+  labelProp: string;
   onChange: (time: string) => void;
 };
 
-export default function TimePicker({ value, onChange }: Props) {
+export default function TimePicker({ value, onChange, labelProp }: Props) {
   const [show, setShow] = useState(false);
 
   const dateValue = value
@@ -18,7 +19,7 @@ export default function TimePicker({ value, onChange }: Props) {
   return (
     <>
       <Pressable onPress={() => setShow(true)}>
-        <TextInput label="Start Time" value={value} editable={false} />
+        <TextInput label={labelProp} value={value} editable={false} />
       </Pressable>
 
       {show && (
