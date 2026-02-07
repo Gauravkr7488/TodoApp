@@ -13,7 +13,6 @@ import { Checkbox, FAB } from "react-native-paper";
 import {
   archiveCompletedTasks,
   getUnarchivedTasks,
-  initDB,
   resetDB,
   toggleDoneStatus,
 } from "../db/db";
@@ -59,9 +58,7 @@ export default function Index() {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-
       async function fetchTasks() {
-        await initDB(); // make sure table exists
         setDbReady(true);
 
         if (isActive) {
@@ -114,7 +111,11 @@ export default function Index() {
             />
             <Pressable
               onPress={() =>
-                router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+              {
+                if(!item.doneStatus){
+                  router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+                }
+              }
               }
             >
               <Text style={[styles.item, item.doneStatus && styles.done]}>
