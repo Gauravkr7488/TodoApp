@@ -5,12 +5,8 @@ import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import {
-  deleteTaskFromTable,
-  getTask,
-  insertTask,
-  updateTask,
-} from "../db/db";
+import { deleteTaskFromTable, getTask, insertTask, updateTask } from "../db/db";
+import TimePicker from "./Components/dateTimePicker";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -47,7 +43,8 @@ const Add_tasks = () => {
     (async () => {
       if (id) {
         const rows = await getTask(id);
-        if (rows.length) { // load task
+        if (rows.length) {
+          // load task
           const task: any = rows[0];
           setName(task.name);
           setDescription(task.description || "");
@@ -169,7 +166,6 @@ const Add_tasks = () => {
               Weekly
             </Chip>
           </View>
-
           {frequency === "weekly" && (
             <View style={styles.chipRow}>
               {DAYS.map((day) => (
@@ -183,27 +179,13 @@ const Add_tasks = () => {
               ))}
             </View>
           )}
-
-          <TextInput
-            label="Start Time (HH:MM)"
-            mode="outlined"
-            value={startTime}
-            onChangeText={setStartTime}
-            style={styles.input}
-          />
-          <TextInput
-            label="End Time (HH:MM)"
-            mode="outlined"
-            value={endTime}
-            onChangeText={setEndTime}
-            style={styles.input}
-          />
-
+          <TimePicker value={startTime} onChange={setStartTime} />
+          <TimePicker value={endTime} onChange={setEndTime} />
+          
           <View style={styles.switchRow}>
             <Text>Is Archived</Text>
             <Switch value={isArchived} onValueChange={setIsArcived} />
           </View>
-
           <View style={styles.switchRow}>
             <Text>Active</Text>
             <Switch value={isActive} onValueChange={setIsActive} />
