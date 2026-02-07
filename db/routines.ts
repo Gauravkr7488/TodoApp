@@ -15,7 +15,7 @@ export async function unarchiveRoutines() {
   const today = new Date();
   const todayISO = today.toISOString().slice(0, 10);
 
-  await toggleTimedTasks(today);
+  // await toggleTimedTasks(today);
   const lastRun = await AsyncStorage.getItem(UNARCHIVE_KEY);
 
   if (!lastRun) {
@@ -40,7 +40,9 @@ export async function unarchiveRoutines() {
   await AsyncStorage.setItem(UNARCHIVE_KEY, todayISO);
 }
 
-async function toggleTimedTasks(today: Date) {
+export async function toggleTimedTasks() {
+  const today = new Date();
+
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
 
   const tasks = (await getAllRoutinedTasks()) as any[];

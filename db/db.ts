@@ -121,7 +121,7 @@ export async function resetDB() {
   await initDB();
 }
 
-export async function unarchiveDailyRoutines() {
+export async function unarchiveDailyRoutines() { // issue
   const db = await getDB();
 
   await db.runAsync(`
@@ -218,11 +218,11 @@ export async function archiveTask(id: string) {
     SET archiveStatus = 1
     WHERE id = ?
     `,
-    [id],
+    id,
   );
 }
 
-export async function matchWeekDay(day: string, id: string){
+export async function matchWeekDay(day: string, id: string) {
   const db = await getDB();
 
   const result = await db.getAllAsync(
@@ -233,7 +233,7 @@ export async function matchWeekDay(day: string, id: string){
       AND frequency = 'weekly'
       AND days LIKE ?
     `,
-    [id, `%${day}%`]
+    [id, `%${day}%`],
   );
 
   return !!result; // true if a row exists, false otherwise

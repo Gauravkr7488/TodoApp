@@ -1,4 +1,4 @@
-import { unarchiveRoutines } from "@/db/routines";
+import { toggleTimedTasks, unarchiveRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -25,6 +25,7 @@ export default function Index() {
   useEffect(() => {
     const run = async () => {
       await unarchiveRoutines();
+      await toggleTimedTasks();
     };
 
     run();
