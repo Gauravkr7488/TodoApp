@@ -1,7 +1,7 @@
 import { STRINGS } from "@/Constants/strings";
 import { getDB } from "./db";
 
-export async function filterTasks(filters: string[] = []) {
+export async function getFilteredTasks(filters: string[] = []) {
   const database = await getDB();
   const archiveStatus = filters.includes(STRINGS.archived) ? 1 : 0;
   const is_routine = filters.includes(STRINGS.routine) ? 1 : 0;
