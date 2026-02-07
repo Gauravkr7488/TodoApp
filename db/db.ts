@@ -2,8 +2,9 @@ import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
 
-export async function getDB() { // cashing causes freezing issues android kills db in bg
-  return await SQLite.openDatabaseAsync("app.db");;
+export async function getDB() {
+  // cashing causes freezing issues android kills db in bg
+  return await SQLite.openDatabaseAsync("app.db");
 }
 
 async function initDB() {
@@ -131,7 +132,21 @@ export async function unarchiveDailyRoutines() {
   `);
 }
 
+export async function unarchiveTask(id: string) {
+  const db = await getDB();
+
+  await db.runAsync(
+    `
+  UPDATE tasks
+  SET archiveStatus = 0, doneStatus = 0
+  WHERE id = ?
+  `,
+    id,
+  );
+}
+
 export async function unarchiveWeeklyRoutines(day: string) {
+  // TODO days should not be stored like this
   const db = await getDB();
   await db.runAsync(
     `
@@ -187,4 +202,39 @@ export async function updateTask(
 export async function getTask(id: string) {
   const db = await getDB();
   return await db.getAllAsync("SELECT * FROM tasks WHERE id = ?", Number(id));
+}
+
+export async function getAllRoutinedTasks() {
+  const db = await getDB();
+  return await db.getAllAsync(`SELECT * FROM tasks WHERE is_routine = 1`);
+}
+
+export async function archiveTask(id: string) {
+  const db = await getDB();
+
+  await db.runAsync(
+    `
+    UPDATE tasks
+    SET archiveStatus = 1
+    WHERE id = ?
+    `,
+    [id],
+  );
+}
+
+export async function matchWeekDay(day: string, id: string){
+  const db = await getDB();
+
+  const result = await db.getAllAsync(
+    `
+    SELECT 1
+    FROM tasks
+    WHERE id = ?
+      AND frequency = 'weekly'
+      AND days LIKE ?
+    `,
+    [id, `%${day}%`]
+  );
+
+  return !!result; // true if a row exists, false otherwise
 }
