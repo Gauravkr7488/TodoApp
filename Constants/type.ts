@@ -71,16 +71,16 @@ export function toIsoDateTime(value: string): IsoDateTime {
  * @description Should be created using `toWeekDay(s: string)`
  */
 export type WeekDay = string & { readonly __brand: unique symbol };
-export function toWeekDay(s:string){
-  if(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].includes(s)) return s as WeekDay;
-  throw new Error(`${s} is not a WeekDay`)
+export function toWeekDay(s: string) {
+  if (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].includes(s))
+    return s as WeekDay;
+  throw new Error(`${s} is not a WeekDay`);
 }
-
 
 /**
  * @description Should be created using `toRepeatType(s: string)`
  */
-type RepeatType = string & { readonly __brand: unique symbol };
+export type RepeatType = string & { readonly __brand: unique symbol };
 
 export function toRepeatType(s: string): RepeatType {
   if (s === "daily" || s === "weekly" || s === "monthly") {
@@ -94,7 +94,7 @@ export type MonthDay = number & { readonly __brand: unique symbol };
 /**
  * @description Should be created using `toDayOfMonth(n: number)`
  */
-export function toDayOfMonth(n: number): MonthDay {
+export function toMonthDay(n: number): MonthDay {
   if (!Number.isInteger(n) || n < 1 || n > 31) {
     throw new Error("DayOfMonth must be between 1 and 31");
   }
@@ -104,7 +104,7 @@ export function toDayOfMonth(n: number): MonthDay {
 /**
  * @description Should be created using `toMinutesSinceMidnight(value: number)`
  */
-type MinutesSinceMidnight = number & { readonly __brand: unique symbol };
+export type MinutesSinceMidnight = number & { readonly __brand: unique symbol };
 
 export function toMinutesSinceMidnight(value: number): MinutesSinceMidnight {
   if (value < 0 || value > 1439 || !Number.isInteger(value)) {

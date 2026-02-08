@@ -2,9 +2,9 @@ import {
   MonthDay,
   Task,
   TaskRow,
-  toDayOfMonth,
   toIsoDateTime,
   toMinutesSinceMidnight,
+  toMonthDay,
   toQuadType,
   toRepeatType,
   toWeekDay,
@@ -47,7 +47,7 @@ function toWeekRepeat(s: string): WeekDay[] | null {
 function toMonthRepeat(s: string): MonthDay[] | null {
   const arr = stringToArray(s);
   if (!arr) return null;
-  return arr.map(toDayOfMonth);
+  return arr.map(toMonthDay);
 }
 
 export class Dal extends Db {
