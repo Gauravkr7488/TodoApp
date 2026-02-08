@@ -1,35 +1,60 @@
-import { WEEKDAYS } from "@/Constants/strings";
-import { Frequency } from "@/Constants/type";
+import { WEEKDAY } from "@/Constants/strings";
+import {
+  MinutesSinceMidnight,
+  MonthDay,
+  QuadType,
+  RepeatType,
+  toMinutesSinceMidnight,
+  toMonthDay,
+  toQuadType,
+  toRepeatType,
+  toWeekDay,
+  WeekDay,
+} from "@/Constants/type";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import { deleteTaskFromTable, getTask, insertTask, updateTask } from "../db/db";
 import TimePicker from "./Components/dateTimePicker";
+import { Dal } from "@/db/DAL";
+import { Db } from "@/db/db";
 
 const Add_tasks = () => {
   const router = useRouter();
-  const DAYS = WEEKDAYS;
   const params = useSearchParams();
-  const id = params.get("id");
 
-  // common
+  // Task
+  const id = params.get("id") as unknown as number;
+
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [value, setValue] = useState("");
+  const [description, setDescription] = useState<string>("");
 
-  // routine-specific
-  const [isRoutine, setIsRoutine] = useState(false);
-  const [frequency, setFrequency] = useState<Frequency>("daily");
-  const [days, setDays] = useState<string>("Sun");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [priorityValue, setPriorityValue] = useState<QuadType>(toQuadType(1));
+
   const [isActive, setIsActive] = useState(true);
   const [isArchived, setIsArcived] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+  const [isOnFocus, setIsOnFocus] = useState(false);
+
+  const [repeatType, setRepeatType] = useState<RepeatType>(
+    toRepeatType("daily"),
+  );
+  const [weekRepeat, setWeekRepeat] = useState<WeekDay[]>([
+    toWeekDay(WEEKDAY.Sun),
+  ]);
+  const [monthRepeat, setMonthRepeat] = useState<MonthDay[]>([]);
+
+  const [startTime, setStartTime] = useState<MinutesSinceMidnight>(
+    toMinutesSinceMidnight(0),
+  );
+  const [endTime, setEndTime] = useState<MinutesSinceMidnight>(
+    toMinutesSinceMidnight(0),
+  );
+
   // other stuff
   const inputRef = useRef<any>(null);
-
+  const [isRoutine, setIsRoutine] = useState(false);
   // useEffects
   useEffect(() => {
     const t = setTimeout(() => {
@@ -42,20 +67,25 @@ const Add_tasks = () => {
   useEffect(() => {
     (async () => {
       if (id) {
-        const rows = await getTask(id);
-        if (rows.length) {
+        const task = await Dal.getTaskById(id);
+        if (task) {
           // load task
-          const task: any = rows[0];
+
           setName(task.name);
-          setDescription(task.description || "");
-          setValue(task.value?.toString() || "0");
-          setIsRoutine(task.is_routine === 1);
-          setFrequency(task.frequency || "");
-          setDays(task.days || "");
-          setStartTime(task.start_time || "");
-          setEndTime(task.end_time || "");
-          setIsActive(task.is_active !== 0);
-          setIsArcived(task.archiveStatus === 1);
+          setDescription(task.description ?? "");
+
+          setPriorityValue(task.priorityValue ?? toQuadType(1));
+
+          setIsActive(task.isActive);
+          setIsArcived(task.isArchived);
+          setIsDone(task.isDone);
+          setIsOnFocus(task.isOnFocus);
+
+          setRepeatType(task.repeatType ?? toRepeatType("daily"));
+          setWeekRepeat(task.weekRepeat ?? []);
+          setMonthRepeat(task.monthRepeat ?? []);
+          setStartTime(task.startTime ?? toMinutesSinceMidnight(0));
+          setEndTime(task.endTime ?? toMinutesSinceMidnight(0));
         }
       }
     })();
@@ -63,37 +93,40 @@ const Add_tasks = () => {
 
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
-    if (frequency == "weekly" && days == "") return alert("choose a day");
-    const numericValue = parseInt(value) || 9;
+    if (repeatType == "weekly" && !weekRepeat) return alert("choose a day");
+    const numericValue = priorityValue;
 
     if (id) {
       // UPDATE existing task
-      await updateTask(
+      await Dal.updateTaskData(
         name,
         description,
-        numericValue,
-        isRoutine,
-        frequency,
-        days,
-        startTime,
-        endTime,
+        priorityValue,
         isActive,
         isArchived,
-        id,
+        isDone,
+        isOnFocus,
+        repeatType,
+        weekRepeat,
+        monthRepeat,
+        startTime,
+        endTime,
       );
     } else {
       // INSERT new task
-      await insertTask(
-        name.trim(),
-        description || null,
-        numericValue,
-        0, // doneStatus
-        isRoutine ? 1 : 0,
-        isRoutine ? frequency || null : null,
-        isRoutine ? days || null : null,
-        isRoutine ? startTime || null : null,
-        isRoutine ? endTime || null : null,
-        isRoutine ? (isActive ? 1 : 0) : null,
+      await Dal.insertTaskDal(
+        name,
+        description,
+        priorityValue,
+        isActive,
+        isArchived,
+        isDone,
+        isOnFocus,
+        repeatType,
+        weekRepeat,
+        monthRepeat,
+        startTime,
+        endTime,
       );
     }
 
@@ -101,21 +134,23 @@ const Add_tasks = () => {
   };
 
   const toggleDay = (day: string) => {
-    setDays((prev) =>
-      prev.includes(day)
-        ? prev
-            .split(",")
-            .filter((d) => d !== day)
-            .join(",")
-        : prev
-          ? `${prev},${day}`
-          : day,
-    );
+    const weekDay = toWeekDay(day); // transform first
+    if (!weekDay) return; // safety if conversion can fail
+
+    setWeekRepeat((prev = []) => {
+      const alreadySelected = prev.includes(weekDay);
+
+      if (alreadySelected) {
+        return prev.filter((d) => d !== weekDay);
+      }
+
+      return [...prev, weekDay];
+    });
   };
 
-  const deleteTask = () => {
+  const handleDeleteTask = () => {
     if (!id) return;
-    deleteTaskFromTable(Number(id));
+    Db.deleteTask(id);
     router.back();
   };
 
@@ -139,8 +174,8 @@ const Add_tasks = () => {
       <TextInput
         label="Value"
         mode="outlined"
-        value={value}
-        onChangeText={setValue}
+        value={priorityValue.toString()}
+        onChangeText={(text) => setPriorityValue(toQuadType(parseInt(text)))}
         keyboardType="numeric"
         style={styles.input}
       />
@@ -154,24 +189,24 @@ const Add_tasks = () => {
         <>
           <View style={styles.chipRow}>
             <Chip
-              selected={frequency === "daily"}
-              onPress={() => setFrequency("daily")}
+              selected={repeatType === "daily"}
+              onPress={() => setRepeatType(toRepeatType("daily"))}
             >
               Daily
             </Chip>
             <Chip
-              selected={frequency === "weekly"}
-              onPress={() => setFrequency("weekly")}
+              selected={repeatType === "weekly"}
+              onPress={() => setRepeatType(toRepeatType("weekly"))}
             >
               Weekly
             </Chip>
           </View>
-          {frequency === "weekly" && (
+          {repeatType === "weekly" && (
             <View style={styles.chipRow}>
-              {DAYS.map((day) => (
+              {Object.values(WEEKDAY).map((day) => (
                 <Chip
                   key={day}
-                  selected={days.includes(day)}
+                  selected={weekRepeat.includes(toWeekDay(day))}
                   onPress={() => toggleDay(day)}
                 >
                   {day}
@@ -179,8 +214,20 @@ const Add_tasks = () => {
               ))}
             </View>
           )}
-          <TimePicker labelProp= "Start Time" value={startTime} onChange={setStartTime} />
-          <TimePicker labelProp= "End Time" value={endTime} onChange={setEndTime} />
+          <TimePicker
+            labelProp="Start Time"
+            value={startTime.toString()}
+            onChange={(text) =>
+              setStartTime(toMinutesSinceMidnight(parseInt(text)))
+            }
+          />
+          <TimePicker
+            labelProp="End Time"
+            value={endTime.toString()}
+            onChange={(text) =>
+              setEndTime(toMinutesSinceMidnight(parseInt(text)))
+            }
+          />
 
           <View style={styles.switchRow}>
             <Text>Is Archived</Text>
@@ -195,7 +242,7 @@ const Add_tasks = () => {
       {id && (
         <FAB
           icon="delete"
-          onPress={deleteTask}
+          onPress={handleDeleteTask}
           style={[styles.fab, { bottom: 80, backgroundColor: "#ef4444" }]}
         />
       )}
