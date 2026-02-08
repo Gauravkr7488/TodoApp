@@ -14,8 +14,12 @@ export function arrayToCSV(arr: any[]): string {
 
 export function toMinutes(time12h: string) {
   const [t, meridiemRaw] = time12h.trim().split(/\s+/);
-  const meridiem = meridiemRaw.toLowerCase();
-
+  let meridiem;
+  try {
+    meridiem = meridiemRaw.toLowerCase();
+  } catch (error) {
+    return null;
+  }
   let [h, m] = t.split(":").map(Number);
 
   if (meridiem === "pm" && h !== 12) h += 12;
