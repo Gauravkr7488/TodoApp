@@ -1,5 +1,5 @@
 export type Task = {
-  id: string;
+  id: number;
 
   name: string;
   description: string | null;
@@ -18,6 +18,28 @@ export type Task = {
 
   createdAt: IsoDateTime;
 };
+
+export type TaskRow = {
+  id: number;
+
+  name: string;
+  description: string | null;
+
+  priorityValue: number | null;
+
+  isDone: number;
+  isArchived: number;
+  isActive: number;
+  isOnFocus: boolean;
+
+  repeat: string | null;
+
+  startTime: number | null;
+  endTime: number | null;
+
+  createdAt: string;
+};
+
 
 export type IsoDateTime = string & { readonly __brand: unique symbol };
 
