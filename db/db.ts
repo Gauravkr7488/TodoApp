@@ -39,7 +39,7 @@ export class Db {
     );
   }
 
-  protected static async toggleDoneStatus(taskId: number, doneStatus: boolean) {
+  static async toggleDoneStatus(taskId: number, doneStatus: boolean) {
     const database = await this.getDB();
     await database.runAsync(
       `UPDATE tasks SET isDone = ? WHERE id = ?`,
@@ -177,21 +177,21 @@ export class Db {
     );
   }
 
-  protected static async getRepeatTasksDB(){
-    const db = await this.getDB()
+  protected static async getRepeatTasksDB() {
+    const db = await this.getDB();
     return db.getAllAsync<TaskRow>(`
         SELECT * FROM TASKS
         WHERE repeatType IS NOT NULL
-      `)
+      `);
   }
 
-  static async archiveTask(id: number){
+  static async archiveTask(id: number) {
     const db = await this.getDB();
-    await db.runAsync(`UPDATE TASKS SET isArchived = 1 WHERE id = ?`, id)
+    await db.runAsync(`UPDATE TASKS SET isArchived = 1 WHERE id = ?`, id);
   }
 
-  static async unarchiveTask(id: number){
+  static async unarchiveTask(id: number) {
     const db = await this.getDB();
-    await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id)
+    await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id);
   }
 }

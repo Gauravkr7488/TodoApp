@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
-import { archiveCompletedTasks, resetDB, toggleDoneStatus } from "../db/db";
+import { Db } from "../db/db";
 import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 
@@ -29,7 +29,7 @@ export default function Index() {
   }, []);
 
   const clearCompleted = async () => {
-    await archiveCompletedTasks();
+    await Db.archiveCompletedTasks();
 
     const rows = await Dal.getUnarchivedTasksList();
     setTasks(sortDoneTasks(rows));
@@ -41,7 +41,7 @@ export default function Index() {
   const onToggle = async (item: any) => {
     const newStatus = item.doneStatus === 0 ? 1 : 0;
 
-    await toggleDoneStatus(item.id, newStatus === 1);
+    await Db.toggleDoneStatus(item.id, newStatus === 1);
 
     setTasks((prev) =>
       sortDoneTasks(
@@ -88,7 +88,7 @@ export default function Index() {
           text: "Reset",
           style: "destructive",
           onPress: async () => {
-            await resetDB();
+            await Db.resetDB();
             await refreshTasks();
           },
         },
