@@ -15,7 +15,7 @@ import {
   WeekDay,
 } from "@/Constants/type";
 import { Db } from "./db";
-import { arrayToCSV, stringToArray } from "./utils";
+import { arrayToCSV, stringToArray, toMinutes } from "./utils";
 
 function mapTaskRowToTask(row: TaskRow): Task {
   return {
@@ -90,9 +90,11 @@ export class Dal extends Db {
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
-    startTime: MinutesSinceMidnight | null,
-    endTime: MinutesSinceMidnight | null,
+    startTimeX: string,
+    endTimeX: string,
   ) {
+    let startTime = toMinutes(startTimeX);
+    let endTime = toMinutes(endTimeX);
     const task = {
       name,
       description,
@@ -120,9 +122,11 @@ export class Dal extends Db {
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
-    startTime: MinutesSinceMidnight | null,
-    endTime: MinutesSinceMidnight | null,
+    startTimeX: string,
+    endTimeX: string,
   ) {
+    const startTime = toMinutes(startTimeX);
+    const endTime = toMinutes(endTimeX);
     const task = createTask(
       name,
       description,
@@ -150,14 +154,13 @@ export class Dal extends Db {
     return mapTaskRowToTask(task[0]);
   }
 
-  static async getRepeatTasks(){
+  static async getRepeatTasks() {
     const tasks = await this.getRepeatTasksDB();
-    return tasks.map(mapTaskRowToTask)
+    return tasks.map(mapTaskRowToTask);
   }
 }
 
 function createTask(
-
   name: string,
   description: string | null,
 
@@ -175,12 +178,11 @@ function createTask(
   startTime: MinutesSinceMidnight | null,
   endTime: MinutesSinceMidnight | null,
 
-  id?: number ,
-
+  id?: number,
 ): Task {
   const iso = new Date().toISOString();
   const createdAt = toIsoDateTime(iso);
-  if(!id) id = 0; 
+  if (!id) id = 0;
   return {
     id,
     name,

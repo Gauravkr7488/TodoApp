@@ -81,14 +81,3 @@ async function unarchiveActiveTasks(
     // }
   }
 }
-
-function toMinutes(time12h: string) {
-  // "02:30 PM"
-  const [t, meridiem] = time12h.trim().split(" ");
-  let [h, m] = t.split(":").map(Number);
-
-  if (meridiem === "PM" && h !== 12) h += 12;
-  if (meridiem === "AM" && h === 12) h = 0;
-
-  return h * 60 + m;
-}

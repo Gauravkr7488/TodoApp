@@ -45,12 +45,8 @@ const Add_tasks = () => {
   ]);
   const [monthRepeat, setMonthRepeat] = useState<MonthDay[]>([]);
 
-  const [startTime, setStartTime] = useState<MinutesSinceMidnight>(
-    toMinutesSinceMidnight(0),
-  );
-  const [endTime, setEndTime] = useState<MinutesSinceMidnight>(
-    toMinutesSinceMidnight(0),
-  );
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
 
   // other stuff
   const inputRef = useRef<any>(null);
@@ -84,8 +80,8 @@ const Add_tasks = () => {
           setRepeatType(task.repeatType ?? toRepeatType("daily"));
           setWeekRepeat(task.weekRepeat ?? []);
           setMonthRepeat(task.monthRepeat ?? []);
-          setStartTime(task.startTime ?? toMinutesSinceMidnight(0));
-          setEndTime(task.endTime ?? toMinutesSinceMidnight(0));
+          setStartTime(task.startTime?.toString() || "");
+          setEndTime(task.endTime?.toString() || "");
         }
       }
     })();
@@ -216,17 +212,13 @@ const Add_tasks = () => {
           )}
           <TimePicker
             labelProp="Start Time"
-            value={startTime.toString()}
-            onChange={(text) =>
-              setStartTime(toMinutesSinceMidnight(parseInt(text)))
-            }
+            value={startTime?.toString() || ""}
+            onChange={setStartTime}
           />
           <TimePicker
             labelProp="End Time"
-            value={endTime.toString()}
-            onChange={(text) =>
-              setEndTime(toMinutesSinceMidnight(parseInt(text)))
-            }
+            value={endTime?.toString() || ""}
+            onChange={setEndTime}
           />
 
           <View style={styles.switchRow}>
