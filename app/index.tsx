@@ -35,8 +35,8 @@ export default function Index() {
     setTasks(sortDoneTasks(rows));
   };
 
-  const sortDoneTasks = (rows: any[]) =>
-    [...rows].sort((a, b) => a.doneStatus - b.doneStatus);
+  const sortDoneTasks = (rows: Task[]) =>
+    [...rows].sort((a, b) => Number(a.isDone) - Number(b.isDone));
 
   const onToggle = async (item: any) => {
     const newStatus = item.doneStatus === 0 ? 1 : 0;
