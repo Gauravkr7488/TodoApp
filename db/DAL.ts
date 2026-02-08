@@ -123,7 +123,7 @@ export class Dal extends Db {
     startTime: MinutesSinceMidnight | null,
     endTime: MinutesSinceMidnight | null,
   ) {
-    const task = creatTask(
+    const task = createTask(
       name,
       description,
       priorityValue,
@@ -156,7 +156,7 @@ export class Dal extends Db {
   }
 }
 
-function creatTask(
+function createTask(
 
   name: string,
   description: string | null,
