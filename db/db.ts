@@ -96,7 +96,7 @@ export async function insertTask(
 
 export async function getUnarchivedTasks() {
   const database = await getDB();
-  return database.getAllAsync<TaskRow[]>(
+  return database.getAllAsync<TaskRow>(
     `SELECT *
      FROM tasks
      WHERE archiveStatus = 0`,

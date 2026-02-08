@@ -13,7 +13,7 @@ export type Task = {
 
   repeatType: RepeatType | null;
   weekRepeat: WeekDay[] | null;
-  monthRepeat: DayOfMonth[] | null;
+  monthRepeat: MonthDay[] | null;
 
   startTime: MinutesSinceMidnight | null;
   endTime: MinutesSinceMidnight | null;
@@ -35,7 +35,8 @@ export type TaskRow = {
   isOnFocus: number;
 
   repeatType: string | null;
-  repeatRule: string | null;
+  weekRepeat: string | null;
+  monthRepeat: string | null;
 
   startTime: number | null;
   endTime: number | null;
@@ -88,16 +89,16 @@ export function toRepeatType(s: string): RepeatType {
   throw new Error(`${s} is not a valid RepeatRule`);
 }
 
-type DayOfMonth = number & { readonly __brand: unique symbol };
+export type MonthDay = number & { readonly __brand: unique symbol };
 
 /**
  * @description Should be created using `toDayOfMonth(n: number)`
  */
-export function toDayOfMonth(n: number): DayOfMonth {
+export function toDayOfMonth(n: number): MonthDay {
   if (!Number.isInteger(n) || n < 1 || n > 31) {
     throw new Error("DayOfMonth must be between 1 and 31");
   }
-  return n as DayOfMonth;
+  return n as MonthDay;
 }
 
 /**
