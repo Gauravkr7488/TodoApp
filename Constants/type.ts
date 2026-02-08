@@ -12,7 +12,8 @@ export type Task = {
   isOnFocus: boolean;
 
   repeatType: RepeatType | null;
-  repeat: Weekday[] | DayOfMonth[] | null;
+  weekRepeat: WeekDay[] | null;
+  monthRepeat: DayOfMonth[] | null;
 
   startTime: MinutesSinceMidnight | null;
   endTime: MinutesSinceMidnight | null;
@@ -65,7 +66,15 @@ export function toIsoDateTime(value: string): IsoDateTime {
   return d.toISOString() as IsoDateTime;
 }
 
-type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
+/**
+ * @description Should be created using `toWeekDay(s: string)`
+ */
+export type WeekDay = string & { readonly __brand: unique symbol };
+export function toWeekDay(s:string){
+  if(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].includes(s)) return s as WeekDay;
+  throw new Error(`${s} is not a WeekDay`)
+}
+
 
 /**
  * @description Should be created using `toRepeatType(s: string)`
