@@ -94,7 +94,6 @@ export async function insertTask(
   );
 }
 
-
 export async function archiveCompletedTasks() {
   const database = await getDB();
   await database.runAsync(
@@ -192,10 +191,6 @@ export async function updateTask(
     Number(id),
   );
 }
-export async function getTask(id: string) {
-  const db = await getDB();
-  return await db.getAllAsync("SELECT * FROM tasks WHERE id = ?", Number(id));
-}
 
 export async function getAllRoutinedTasks() {
   const db = await getDB();
@@ -239,6 +234,14 @@ export class Db {
       `SELECT *
      FROM tasks
      WHERE archiveStatus = 0`,
+    );
+  }
+
+  protected static async getTask(id: number) {
+    const db = await getDB();
+    return await db.getAllAsync<TaskRow>(
+      "SELECT * FROM tasks WHERE id = ?",
+      Number(id),
     );
   }
 }

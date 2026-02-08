@@ -55,4 +55,9 @@ export class Dal extends Db {
     const unarchivedTasks = await this.getUnarchivedTasks();
     return unarchivedTasks.map(mapTaskRowToTask);
   }
+
+  static async getTaskById(id: number){
+    const task = await this.getTask(id)
+    return mapTaskRowToTask(task[0]);
+  }
 }
