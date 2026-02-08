@@ -94,14 +94,6 @@ export async function insertTask(
   );
 }
 
-// export async function getUnarchivedTasks() {
-//   const database = await getDB();
-//   return database.getAllAsync<TaskRow>(
-//     `SELECT *
-//      FROM tasks
-//      WHERE archiveStatus = 0`,
-//   );
-// }
 
 export async function archiveCompletedTasks() {
   const database = await getDB();
@@ -241,7 +233,7 @@ export async function matchWeekDay(day: string, id: string) {
 }
 
 export class Db {
-  protected async getUnarchivedTasks() {
+  protected static async getUnarchivedTasks() {
     const database = await getDB();
     return database.getAllAsync<TaskRow>(
       `SELECT *

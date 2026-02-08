@@ -1,5 +1,5 @@
 import {
-    MonthDay,
+  MonthDay,
   Task,
   TaskRow,
   toDayOfMonth,
@@ -10,13 +10,8 @@ import {
   toWeekDay,
   WeekDay,
 } from "@/Constants/type";
-import { getUnarchivedTasks } from "./db";
+import { Db } from "./db";
 import { stringToArray } from "./utils";
-
-export async function getUnarchivedTasksList(): Promise<Task[]> {
-  const unarchivedTasks = await getUnarchivedTasks();
-  return unarchivedTasks.map(mapTaskRowToTask)
-}
 
 function mapTaskRowToTask(row: TaskRow): Task {
   return {
@@ -55,3 +50,9 @@ function toMonthRepeat(s: string): MonthDay[] | null {
   return arr.map(toDayOfMonth);
 }
 
+export class Dal extends Db {
+  static async getUnarchivedTasksList(): Promise<Task[]> {
+    const unarchivedTasks = await this.getUnarchivedTasks();
+    return unarchivedTasks.map(mapTaskRowToTask);
+  }
+}
