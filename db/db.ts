@@ -94,14 +94,14 @@ export async function insertTask(
   );
 }
 
-export async function getUnarchivedTasks() {
-  const database = await getDB();
-  return database.getAllAsync<TaskRow>(
-    `SELECT *
-     FROM tasks
-     WHERE archiveStatus = 0`,
-  );
-}
+// export async function getUnarchivedTasks() {
+//   const database = await getDB();
+//   return database.getAllAsync<TaskRow>(
+//     `SELECT *
+//      FROM tasks
+//      WHERE archiveStatus = 0`,
+//   );
+// }
 
 export async function archiveCompletedTasks() {
   const database = await getDB();
@@ -121,7 +121,8 @@ export async function resetDB() {
   await initDB();
 }
 
-export async function unarchiveDailyRoutines() { // issue
+export async function unarchiveDailyRoutines() {
+  // issue
   const db = await getDB();
 
   await db.runAsync(`
@@ -237,4 +238,15 @@ export async function matchWeekDay(day: string, id: string) {
   );
 
   return !!result; // true if a row exists, false otherwise
+}
+
+export class Db {
+  protected async getUnarchivedTasks() {
+    const database = await getDB();
+    return database.getAllAsync<TaskRow>(
+      `SELECT *
+     FROM tasks
+     WHERE archiveStatus = 0`,
+    );
+  }
 }
