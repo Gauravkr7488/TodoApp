@@ -83,6 +83,42 @@ export class Db {
       task.createdAt, // todo
     );
   }
+  protected static async updateTask(task: TaskRow) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `
+       UPDATE TASKS
+        SET
+          name = ?,
+          description = ?,
+          priorityValue = ?,
+          isDone = ?,
+          isArchived = ?,
+          isActive = ?,
+          isOnFocus = ?,
+          repeatType = ?,
+          weekRepeat = ?,
+          monthRepeat = ?,
+          startTime = ?,
+          endTime = ?,
+        WHERE id = ?;
+
+      `,
+      task.name,
+      task.description,
+      task.priorityValue,
+      task.isDone,
+      task.isArchived,
+      task.isActive,
+      task.isOnFocus,
+      task.repeatType,
+      task.weekRepeat,
+      task.monthRepeat,
+      task.startTime,
+      task.endTime,
+      task.id,
+    );
+  }
 
   static async archiveCompletedTasks() {
     const database = await this.getDB();
@@ -111,16 +147,21 @@ export class Db {
     const database = await this.getDB();
     return database.getAllAsync<TaskRow>(
       `SELECT *
-     FROM tasks
-     WHERE archiveStatus = 0`,
+     FROM TASKS
+     WHERE isArchived = 0`,
     );
   }
 
   protected static async getTask(id: number) {
     const db = await this.getDB();
     return await db.getAllAsync<TaskRow>(
-      "SELECT * FROM tasks WHERE id = ?",
+      "SELECT * FROM TASKS WHERE id = ?",
       Number(id),
     );
+  }
+
+  public static async deleteTask(id: number) {
+    const db = await this.getDB();
+    return await db.runAsync(`DELETE FROM TASKS WHERE id = ?`, id);
   }
 }
