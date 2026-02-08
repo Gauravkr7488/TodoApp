@@ -149,6 +149,11 @@ export class Dal extends Db {
     const task = await this.getTask(id);
     return mapTaskRowToTask(task[0]);
   }
+
+  static async getRepeatTasks(){
+    const tasks = await this.getRepeatTasksDB();
+    return tasks.map(mapTaskRowToTask)
+  }
 }
 
 function creatTask(

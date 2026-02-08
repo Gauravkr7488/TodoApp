@@ -1,13 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  archiveTask,
-  getAllRoutinedTasks,
-  getTask,
-  matchWeekDay,
-  unarchiveDailyRoutines,
-  unarchiveTask,
-  unarchiveWeeklyRoutines,
-} from "./db";
+import { Db } from "./db";
+import { Task } from "@/Constants/type";
+import { Dal } from "./DAL";
 
 const UNARCHIVE_KEY = "last_unarchive_date";
 
@@ -25,7 +19,7 @@ export async function unarchiveRoutines() {
 
   if (lastRun === todayISO) return;
 
-  await unarchiveDailyRoutines();
+  await Db.unarchiveDailyRoutines();
 
   // weekly logic
   const cursor = new Date(lastRun);
@@ -33,7 +27,7 @@ export async function unarchiveRoutines() {
 
   while (cursor <= today) {
     const day = cursor.toLocaleDateString("en-US", { weekday: "short" });
-    await unarchiveWeeklyRoutines(day);
+    await Db.unarchiveWeeklyRoutinesDB(day);
     cursor.setDate(cursor.getDate() + 1);
   }
 
@@ -45,26 +39,27 @@ export async function toggleTimedTasks() {
 
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
 
-  const tasks = (await getAllRoutinedTasks()) as any[];
+  const tasks = await Dal.getRepeatTasks();
 
   for (const task of tasks) {
-    if (!task.start_time || !task.end_time) continue;
+    if (!task.startTime || !task.endTime) continue;
 
-    const start = toMinutes(task.start_time);
-    const end = toMinutes(task.end_time);
+    // const start = toMinutes(task.startTime);
+    // const end = toMinutes(task.end_time);
 
-    await unarchiveActiveTasks(nowMinutes, start, end, task, today);
-    await archiveNonActiveTasks(nowMinutes, end, task);
+    await unarchiveActiveTasks(nowMinutes, task.startTime, task.endTime, task, today);
+    await archiveNonActiveTasks(nowMinutes, task.endTime, task);
   }
 }
 
 async function archiveNonActiveTasks(
   nowMinutes: number,
   end: number,
-  task: any,
+  task: Task,
 ) {
-  if (nowMinutes > end) { // edge case 
-    await archiveTask(task.id); // function to archive single task
+  if (nowMinutes > end) {
+    // edge case
+    await Db.archiveTask(task.id); // function to archive single task
   }
 }
 
@@ -72,21 +67,20 @@ async function unarchiveActiveTasks(
   nowMinutes: number,
   start: number,
   end: number,
-  task: any,
+  task: Task,
   today: Date,
 ) {
   if (nowMinutes < start || nowMinutes > end) return; // not active
 
-  if (task.frequency !== "weekly") {
-    await unarchiveTask(task.id); // unarchive non-weekly tasks
+  if (task.repeatType !== "weekly") {
+    await Db.unarchiveTask(task.id); // unarchive non-weekly tasks
   } else {
     const day = today.toLocaleDateString("en-US", { weekday: "short" });
-    if (await matchWeekDay(day, task.id)) {
-      await unarchiveTask(task.id); // only unarchive weekly task if today matches
-    }
+    // if (await matchWeekDay(day, task.id)) { // this is faulty anyways
+    //   await Db.unarchiveTask(task.id); // only unarchive weekly task if today matches
+    // }
   }
 }
-
 
 function toMinutes(time12h: string) {
   // "02:30 PM"

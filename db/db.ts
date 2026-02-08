@@ -164,4 +164,34 @@ export class Db {
     const db = await this.getDB();
     return await db.runAsync(`DELETE FROM TASKS WHERE id = ?`, id);
   }
+
+  public static async unarchiveWeeklyRoutinesDB(day: string) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `
+        UPDATE TASKS
+        SET isArchived = 0, isDone = 0
+        WHERE repeatType = 'weekly' AND weekRepeat LIKE ?
+      `,
+      [`%${day}%`],
+    );
+  }
+
+  protected static async getRepeatTasksDB(){
+    const db = await this.getDB()
+    return db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS
+        WHERE repeatType IS NOT NULL
+      `)
+  }
+
+  static async archiveTask(id: number){
+    const db = await this.getDB();
+    await db.runAsync(`UPDATE TASKS SET isArchived = 1 WHERE id = ?`, id)
+  }
+
+  static async unarchiveTask(id: number){
+    const db = await this.getDB();
+    await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id)
+  }
 }
