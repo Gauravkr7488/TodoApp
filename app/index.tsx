@@ -10,16 +10,13 @@ import {
   View,
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
-import {
-  archiveCompletedTasks,
-  getUnarchivedTasks,
-  resetDB,
-  toggleDoneStatus,
-} from "../db/db";
+import { archiveCompletedTasks, resetDB, toggleDoneStatus } from "../db/db";
+import { Task } from "@/Constants/type";
+import { Dal } from "@/db/DAL";
 
 export default function Index() {
   const router = useRouter();
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
@@ -34,7 +31,7 @@ export default function Index() {
   const clearCompleted = async () => {
     await archiveCompletedTasks();
 
-    const rows = await getUnarchivedTasks();
+    const rows = await Dal.getUnarchivedTasksList();
     setTasks(sortDoneTasks(rows));
   };
 
@@ -63,7 +60,7 @@ export default function Index() {
         setDbReady(true);
 
         if (isActive) {
-          const rows = await getUnarchivedTasks();
+          const rows = await Dal.getUnarchivedTasksList();
           setTasks(sortDoneTasks(rows));
         }
       }
@@ -77,7 +74,7 @@ export default function Index() {
   );
 
   const refreshTasks = async () => {
-    const rows = await getUnarchivedTasks();
+    const rows = await Dal.getUnarchivedTasksList();
     setTasks(rows);
   };
 
@@ -107,19 +104,20 @@ export default function Index() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Checkbox
-              status={item.doneStatus ? "checked" : "unchecked"}
+              status={item.isDone ? "checked" : "unchecked"}
               onPress={() => onToggle(item)}
             />
             <Pressable
-              onPress={() =>
-              {
-                if(!item.doneStatus){
-                  router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+              onPress={() => {
+                if (!item.isDone) {
+                  router.push({
+                    pathname: "/Add_tasks",
+                    params: { id: item.id },
+                  });
                 }
-              }
-              }
+              }}
             >
-              <Text style={[styles.item, item.doneStatus && styles.done]}>
+              <Text style={[styles.item, item.isDone && styles.done]}>
                 {item.name}
               </Text>
             </Pressable>
