@@ -4,14 +4,15 @@ export type Task = {
   name: string;
   description: string | null;
 
-  priorityValue: number | null;
+  priorityValue: QuadType | null;
 
   isDone: boolean;
   isArchived: boolean;
   isActive: boolean;
   isOnFocus: boolean;
 
-  repeat: RepeatRule | null;
+  repeatType: RepeatType | null;
+  repeat: Weekday[] | DayOfMonth[] | null;
 
   startTime: MinutesSinceMidnight | null;
   endTime: MinutesSinceMidnight | null;
@@ -30,9 +31,10 @@ export type TaskRow = {
   isDone: number;
   isArchived: number;
   isActive: number;
-  isOnFocus: boolean;
+  isOnFocus: number;
 
-  repeat: string | null;
+  repeatType: string | null;
+  repeatRule: string | null;
 
   startTime: number | null;
   endTime: number | null;
@@ -40,8 +42,14 @@ export type TaskRow = {
   createdAt: string;
 };
 
-
 export type IsoDateTime = string & { readonly __brand: unique symbol };
+
+export type QuadType = number & { readonly __brand: unique symbol };
+
+export function toQuadType(value: number): QuadType {
+  if ([1, 2, 3, 4].includes(value)) return value as unknown as QuadType;
+  throw new Error(`${value} is not QuadType`);
+}
 
 export function toIsoDateTime(value: string): IsoDateTime {
   const d = new Date(value);
@@ -53,11 +61,14 @@ export function toIsoDateTime(value: string): IsoDateTime {
 
 type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
-type RepeatRule =
-  | { type: "daily" }
-  | { type: "weekly"; days: Weekday[] }
-  | { type: "monthly"; dates: DayOfMonth[] }
-  | { type: "interval"; every: number; unit: "day" | "week" | "month" };
+type RepeatType = string & { readonly __brand: unique symbol };
+
+export function toRepeatType(s: string): RepeatType {
+  if (s === "daily" || s === "weekly" || s === "monthly") {
+    return s as RepeatType;
+  }
+  throw new Error(`${s} is not a valid RepeatRule`);
+}
 
 type DayOfMonth = number & { readonly __brand: unique symbol };
 
