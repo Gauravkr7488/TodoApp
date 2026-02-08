@@ -42,8 +42,14 @@ export type TaskRow = {
   createdAt: string;
 };
 
+/**
+ * @description Should be created using `toIsoDateTime(value: string)`
+ */
 export type IsoDateTime = string & { readonly __brand: unique symbol };
 
+/**
+ * @description Should be created using `toQuadType(value: number)`
+ */
 export type QuadType = number & { readonly __brand: unique symbol };
 
 export function toQuadType(value: number): QuadType {
@@ -61,6 +67,9 @@ export function toIsoDateTime(value: string): IsoDateTime {
 
 type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
+/**
+ * @description Should be created using `toRepeatType(s: string)`
+ */
 type RepeatType = string & { readonly __brand: unique symbol };
 
 export function toRepeatType(s: string): RepeatType {
@@ -72,6 +81,9 @@ export function toRepeatType(s: string): RepeatType {
 
 type DayOfMonth = number & { readonly __brand: unique symbol };
 
+/**
+ * @description Should be created using `toDayOfMonth(n: number)`
+ */
 export function toDayOfMonth(n: number): DayOfMonth {
   if (!Number.isInteger(n) || n < 1 || n > 31) {
     throw new Error("DayOfMonth must be between 1 and 31");
@@ -79,6 +91,9 @@ export function toDayOfMonth(n: number): DayOfMonth {
   return n as DayOfMonth;
 }
 
+/**
+ * @description Should be created using `toMinutesSinceMidnight(value: number)`
+ */
 type MinutesSinceMidnight = number & { readonly __brand: unique symbol };
 
 export function toMinutesSinceMidnight(value: number): MinutesSinceMidnight {
