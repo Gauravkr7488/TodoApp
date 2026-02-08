@@ -1,3 +1,4 @@
+import { STRINGS } from "@/Constants/strings";
 import { TaskRow } from "@/Constants/type";
 import * as SQLite from "expo-sqlite";
 
@@ -193,5 +194,34 @@ export class Db {
   static async unarchiveTask(id: number) {
     const db = await this.getDB();
     await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id);
+  }
+
+  static async getFilteredTasks(
+    includeFilter: string[] = [],
+    excludeFilter: string[] = [],
+  ) {
+    const db = await this.getDB();
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+
+    if (includeFilter.includes(STRINGS.archived)) {
+      conditions.push(`isArchived = ?`);
+      params.push(1);
+    }
+
+    if (includeFilter.includes(STRINGS.routine)) {
+      conditions.push(`repeatType IS NOT NULL`);
+    }
+
+    if (excludeFilter.includes(STRINGS.routine)) {
+      conditions.push(`repeatType IS NULL`);
+    }
+
+    const query =
+      `SELECT * FROM TASKS` +
+      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``);
+
+    return await db.getAllAsync(query, params);
   }
 }
