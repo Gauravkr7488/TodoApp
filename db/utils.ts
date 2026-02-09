@@ -1,4 +1,4 @@
-import { toMinutesSinceMidnight } from "@/Constants/type";
+import { MinutesSinceMidnight, toMinutesSinceMidnight } from "@/Constants/type";
 
 /**
  * @description for a comma seperated strings only
@@ -27,4 +27,13 @@ export function toMinutes(time12h: string) {
 
   let time = h * 60 + m;
   return toMinutesSinceMidnight(time);
+}
+
+export function formatMinutesToAMPM(minutes: MinutesSinceMidnight) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const period = h >= 12 ? "pm" : "am";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const minStr = m.toString().padStart(2, "0");
+  return `${hour12}:${minStr} ${period}`;
 }

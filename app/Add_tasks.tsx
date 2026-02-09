@@ -19,6 +19,7 @@ import { Chip, FAB, TextInput } from "react-native-paper";
 import TimePicker from "./Components/dateTimePicker";
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
+import { formatMinutesToAMPM, toMinutes } from "@/db/utils";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -81,6 +82,7 @@ const Add_tasks = () => {
 
           setIsRoutine(!!task.repeatType);
         }
+        console.log(task);
       }
     })();
   }, [id]);
@@ -221,16 +223,26 @@ const Add_tasks = () => {
           )}
           <TimePicker
             labelProp="Start Time"
-            value={startTime?.toString() || ""}
+            value={startTime != null ? formatMinutesToAMPM(startTime) : ""}
             onChange={(time: string) => {
-              setStartTime(toMinutesSinceMidnight(Number(time)));
+              const inMin = toMinutes(time);
+              if (inMin == 0) {
+                alert("12:00 AM cannot be selected.");
+                return;
+              }
+              setStartTime(inMin);
             }}
           />
           <TimePicker
             labelProp="End Time"
-            value={endTime?.toString() || ""}
+            value={endTime != null ? formatMinutesToAMPM(endTime) : ""}
             onChange={(time: string) => {
-              setEndTime(toMinutesSinceMidnight(Number(time)));
+              const inMin = toMinutes(time);
+              if (inMin == 0) {
+                alert("12:00 AM cannot be selected.");
+                return;
+              }
+              setEndTime(inMin);
             }}
           />
         </>
