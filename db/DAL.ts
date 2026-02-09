@@ -1,14 +1,12 @@
 import {
   MinutesSinceMidnight,
   MonthDay,
-  QuadType,
   RepeatType,
   Task,
   TaskRow,
   toIsoDateTime,
   toMinutesSinceMidnight,
   toMonthDay,
-  toQuadType,
   toRepeatType,
   toWeekDay,
   WeekDay,
@@ -23,7 +21,6 @@ function mapTaskRowToTask(row: TaskRow): Task {
     name: row.name,
     description: row.description,
 
-    priorityValue: row.priorityValue ? toQuadType(row.priorityValue) : null,
 
     isDone: !!row.isDone,
     isArchived: !!row.isArchived,
@@ -48,7 +45,6 @@ function mapTaskTotaskRow(task: Task): TaskRow {
     name: task.name,
     description: task.description,
 
-    priorityValue: task.priorityValue,
 
     isDone: task.isDone ? 1 : 0,
     isArchived: task.isArchived ? 1 : 0,
@@ -100,7 +96,6 @@ export class Dal extends Db {
   static async updateTaskData(
     name: string,
     description: string | null,
-    priorityValue: QuadType | null,
     isActive: boolean,
     isArchived: boolean,
     isDone: boolean,
@@ -115,7 +110,6 @@ export class Dal extends Db {
     const task = createTask(
       name,
       description,
-      priorityValue,
       isActive,
       isArchived,
       isDone,
@@ -132,7 +126,6 @@ export class Dal extends Db {
   static async insertTaskDal(
     name: string,
     description: string | null,
-    priorityValue: QuadType | null,
     isActive: boolean,
     isArchived: boolean,
     isDone: boolean,
@@ -146,7 +139,6 @@ export class Dal extends Db {
     const task = createTask(
       name,
       description,
-      priorityValue,
       isDone,
       isArchived,
       isActive,
@@ -190,7 +182,6 @@ function createTask(
   name: string,
   description: string | null,
 
-  priorityValue: QuadType | null,
 
   isDone: boolean,
   isArchived: boolean,
@@ -213,7 +204,6 @@ function createTask(
     id,
     name,
     description,
-    priorityValue,
     isActive,
     isArchived,
     isDone,

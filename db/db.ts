@@ -56,9 +56,6 @@ export class Db {
             startTime INTEGER,
             endTime INTEGER,
             
-            parentIds TEXT,
-            childIds TEXT,
-            
             createdAt TEXT NOT NULL
         );
 
@@ -82,7 +79,6 @@ export class Db {
         INSERT INTO TASKS (
           name,
           description,
-          priorityValue,
           isDone,
           isArchived,
           isActive,
@@ -97,7 +93,6 @@ export class Db {
       `,
       task.name,
       task.description,
-      task.priorityValue,
       task.isDone,
       task.isArchived,
       task.isActive,
@@ -118,7 +113,6 @@ export class Db {
         SET
           name = ?,
           description = ?,
-          priorityValue = ?,
           isDone = ?,
           isArchived = ?,
           isActive = ?,
@@ -133,7 +127,6 @@ export class Db {
       `,
       task.name,
       task.description,
-      task.priorityValue,
       task.isDone,
       task.isArchived,
       task.isActive,
