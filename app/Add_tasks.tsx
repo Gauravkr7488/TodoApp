@@ -78,6 +78,8 @@ const Add_tasks = () => {
           setMonthRepeat(task.monthRepeat);
           setStartTime(task.startTime);
           setEndTime(task.endTime);
+
+          setIsRoutine(!!task.repeatType);
         }
       }
     })();
@@ -192,12 +194,6 @@ const Add_tasks = () => {
               onPress={() => setRepeatType(toRepeatType("weekly"))}
             >
               Weekly
-            </Chip>
-            <Chip
-              selected={repeatType === "weekly"}
-              onPress={() => setRepeatType(toRepeatType("monthly"))}
-            >
-              Monthly
             </Chip>
           </View>
           {repeatType === "weekly" && (
