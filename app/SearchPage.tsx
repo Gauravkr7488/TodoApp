@@ -12,7 +12,7 @@ export default function TaskPage() {
   const [includeFilters, setIncludeFilters] = useState<string[]>([]);
   const [excludeFilters, setExcludeFilters] = useState<string[]>([]);
   const searchFilters = [STRINGS.archived, STRINGS.routine];
-
+  const [vState, setVstate] = useState("include");
   const refreshTasks = async (
     includeFilters: string[],
     excludeFilters: string[],
@@ -57,7 +57,18 @@ export default function TaskPage() {
     // none → include
     setIncludeFilters((prev) => [...prev, filter]);
   };
-
+  const getState = (filter: string) => {
+    if (includeFilters.includes(filter)) {
+      setVstate("include");
+      return;
+    }
+    if (excludeFilters.includes(filter)) {
+      setVstate("exclude");
+      return;
+    }
+    setVstate("none");
+    return;
+  };
   return (
     <View style={styles.container}>
       <TextInput label="Search" mode="outlined" onChangeText={setText} />
@@ -65,10 +76,16 @@ export default function TaskPage() {
         {searchFilters.map((filter) => (
           <Chip
             key={filter}
-            selected={includeFilters.includes(filter)}
-            onPress={() => {
-              onFilterPress(filter);
+            selected={vState === "include"}
+            style={{
+              backgroundColor:
+                vState === "include"
+                  ? "green"
+                  : vState === "exclude"
+                    ? "red"
+                    : "gray",
             }}
+            onPress={() => onFilterPress(filter)}
           >
             {filter}
           </Chip>
