@@ -131,8 +131,8 @@ const Add_tasks = () => {
     const weekDay = toWeekDay(day); // transform first
     if (!weekDay) return; // safety if conversion can fail
 
-    setWeekRepeat((prev = []) => {
-      if (!prev) throw new Error("week error");
+    setWeekRepeat((prev) => {
+      if (!prev) prev = [];
       const alreadySelected = prev.includes(weekDay);
 
       if (alreadySelected) {
@@ -197,7 +197,10 @@ const Add_tasks = () => {
             </Chip>
             <Chip
               selected={repeatType === "weekly"}
-              onPress={() => setRepeatType(toRepeatType("weekly"))}
+              onPress={() => {
+                setRepeatType(toRepeatType("weekly"));
+                setWeekRepeat([toWeekDay(WEEKDAY.Sun)]); // to set default
+              }}
             >
               Weekly
             </Chip>
