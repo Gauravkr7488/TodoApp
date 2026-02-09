@@ -7,9 +7,9 @@ export type Task = {
   priorityValue: QuadType | null;
 
   isDone: boolean;
-  isArchived: boolean;
-  isActive: boolean;
-  isOnFocus: boolean;
+  isArchived: boolean; // for the tasks that are done and gone
+  isActive: boolean;  // for routines that you want to be active
+  isOnFocus: boolean; // for those tasks that you want to see on homepage
 
   repeatType: RepeatType | null;
   weekRepeat: WeekDay[] | null;
