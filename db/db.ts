@@ -89,7 +89,7 @@ export class Db {
           startTime,
           endTime,
           createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       `,
       task.name,
       task.description,
