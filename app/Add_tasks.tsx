@@ -177,7 +177,13 @@ const Add_tasks = () => {
 
       <View style={styles.switchRow}>
         <Text>Is Routine</Text>
-        <Switch value={isRoutine} onValueChange={setIsRoutine} />
+        <Switch
+          value={isRoutine}
+          onValueChange={(value) => {
+            setIsRoutine(value);
+            setRepeatType(value ? toRepeatType("daily") : null);
+          }}
+        />
       </View>
 
       {isRoutine && (
