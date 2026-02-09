@@ -44,8 +44,6 @@ export class Db {
             name TEXT NOT NULL,
             description TEXT,
 
-            priorityValue INTEGER,
-
             isDone INTEGER NOT NULL,
             isArchived INTEGER NOT NULL,
             isActive INTEGER NOT NULL,
@@ -58,7 +56,6 @@ export class Db {
             startTime INTEGER,
             endTime INTEGER,
             
-            tags TEXT,
             parentIds TEXT,
             childIds TEXT,
             
