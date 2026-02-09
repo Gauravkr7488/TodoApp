@@ -79,6 +79,20 @@ function toMonthRepeat(s: string): MonthDay[] | null {
 }
 
 export class Dal extends Db {
+  static async getAllTodayRoutines() {
+    const tasks = await this.getAllNonDoneTask();
+    return tasks.filter((task) => !!task.repeatType);
+  }
+
+  static async getAllNonDoneTask() {
+    const tasks = await this.getAllNonDoneRows();
+    return tasks.map(mapTaskRowToTask);
+  }
+  
+  static async getAllActiveTasks(): Promise<Task[]> {
+    const tasks = await this.getAllActiveRows();
+    return tasks.map(mapTaskRowToTask);
+  }
   static async updateTaskData(
     name: string,
     description: string | null,

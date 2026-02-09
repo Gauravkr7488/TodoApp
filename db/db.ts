@@ -224,11 +224,28 @@ export class Db {
 
     const query =
       `SELECT * FROM TASKS` +
-      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ` ORDER BY id DESC LIMIT 100;`);
+      (conditions.length
+        ? ` WHERE ` + conditions.join(` AND `)
+        : ` ORDER BY id DESC LIMIT 100;`);
 
     let c = await db.getAllAsync<TaskRow>(query, params);
     // console.log(c[0]);
-    
+
     return c;
   }
+
+  protected static async getAllActiveRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isActive = 1
+      `);
+  }
+
+  protected static async getAllNonDoneRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isDone = 0
+      `);
+  }
+
 }

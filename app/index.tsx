@@ -20,15 +20,22 @@ export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [dbReady, setDbReady] = useState(false);
-
+  const homeFilter = [
+    STRINGS.all,
+    STRINGS.routine,
+    STRINGS.onfocus,
+    STRINGS.current,
+  ];
+  const [activeTab, setActiveTab] = useState(STRINGS.onfocus);
   useEffect(() => {
     const run = async () => {
       await unarchiveRoutines();
       await toggleTimedTasks();
+      await refreshTasks();
     };
 
     run();
-  }, []);
+  }, [activeTab]);
 
   const clearCompleted = async () => {
     await Db.archiveCompletedTasks();
@@ -76,8 +83,22 @@ export default function Index() {
   );
 
   const refreshTasks = async () => {
-    const rows = await Dal.getUnarchivedTasksList();
-    setTasks(rows);
+    // entry point of tasks
+    let rows: Task[] = [];
+    if (activeTab == STRINGS.current) {
+      rows = await Dal.getAllActiveTasks();
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.all) {
+      rows = await Dal.getAllNonDoneTask();
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.routine) {
+      rows = await Dal.getAllTodayRoutines();
+      setTasks(rows);
+    }
   };
 
   const handleReset = () => {
@@ -97,11 +118,16 @@ export default function Index() {
       ],
     );
   };
-  const homeFilter = [STRINGS.all ,STRINGS.routine, STRINGS.onfocus];
-  const [activeTab, setActiveTab] = useState(STRINGS.onfocus);
+
   return (
     <View style={styles.container}>
-      <Tabs tabs={homeFilter} activeTab={activeTab} onChange={setActiveTab} />
+      <Tabs
+        tabs={homeFilter}
+        activeTab={activeTab}
+        onChange={async (value) => {
+          setActiveTab(value);
+        }}
+      />
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
