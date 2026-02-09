@@ -87,15 +87,14 @@ export class Dal extends Db {
     isArchived: boolean,
     isDone: boolean,
     isOnFocus: boolean,
-    repeatType: RepeatType | null,
+    repeatTypeX: string,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
     startTimeX: string,
     endTimeX: string,
   ) {
-    let startTime = toMinutes(startTimeX);
     let endTime = toMinutes(endTimeX);
-    const task = {
+    const task = createTask(
       name,
       description,
       priorityValue,
@@ -103,12 +102,12 @@ export class Dal extends Db {
       isArchived,
       isDone,
       isOnFocus,
-      repeatType,
+      repeatTypeX ? toRepeatType(repeatTypeX) : null,
       weekRepeat,
       monthRepeat,
-      startTime,
-      endTime,
-    } as Task;
+      startTimeX ? toMinutes(startTimeX) : null,
+      endTimeX ? toMinutes(endTimeX) : null,
+    );
     await this.updateTask(mapTaskTotaskRow(task));
   }
   static async insertTaskDal(
@@ -119,14 +118,12 @@ export class Dal extends Db {
     isArchived: boolean,
     isDone: boolean,
     isOnFocus: boolean,
-    repeatType: RepeatType | null,
+    repeatType: string,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
-    startTimeX: string,
-    endTimeX: string,
+    startTime: string,
+    endTime: string,
   ) {
-    const startTime = toMinutes(startTimeX);
-    const endTime = toMinutes(endTimeX);
     const task = createTask(
       name,
       description,
@@ -135,12 +132,14 @@ export class Dal extends Db {
       isArchived,
       isActive,
       isOnFocus,
-      repeatType,
+      repeatType ? toRepeatType(repeatType) : null,
       weekRepeat,
       monthRepeat,
-      startTime,
-      endTime,
+      startTime ? toMinutes(startTime) : null,
+      endTime ? toMinutes(endTime) : null,
     );
+    console.log(task);
+
     await this.insertTask(mapTaskTotaskRow(task));
   }
 

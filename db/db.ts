@@ -222,6 +222,9 @@ export class Db {
       `SELECT * FROM TASKS` +
       (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``);
 
-    return await db.getAllAsync<TaskRow>(query, params);
+    let c = await db.getAllAsync<TaskRow>(query, params);
+    console.log(includeFilter, excludeFilter,"rep:", c[0].name,c[0].repeatType);
+    
+    return c;
   }
 }

@@ -37,12 +37,8 @@ const Add_tasks = () => {
   const [isDone, setIsDone] = useState(false);
   const [isOnFocus, setIsOnFocus] = useState(false);
 
-  const [repeatType, setRepeatType] = useState<RepeatType>(
-    toRepeatType("daily"),
-  );
-  const [weekRepeat, setWeekRepeat] = useState<WeekDay[]>([
-    toWeekDay(WEEKDAY.Sun),
-  ]);
+  const [repeatType, setRepeatType] = useState<string>("");
+  const [weekRepeat, setWeekRepeat] = useState<WeekDay[] | null>(null);
   const [monthRepeat, setMonthRepeat] = useState<MonthDay[]>([]);
 
   const [startTime, setStartTime] = useState<string>("");
@@ -77,7 +73,7 @@ const Add_tasks = () => {
           setIsDone(task.isDone);
           setIsOnFocus(task.isOnFocus);
 
-          setRepeatType(task.repeatType ?? toRepeatType("daily"));
+          setRepeatType(task.repeatType?.toString() ?? "");
           setWeekRepeat(task.weekRepeat ?? []);
           setMonthRepeat(task.monthRepeat ?? []);
           setStartTime(task.startTime?.toString() || "");
@@ -134,6 +130,7 @@ const Add_tasks = () => {
     if (!weekDay) return; // safety if conversion can fail
 
     setWeekRepeat((prev = []) => {
+      if(!prev) throw new Error("week error");
       const alreadySelected = prev.includes(weekDay);
 
       if (alreadySelected) {
@@ -202,7 +199,7 @@ const Add_tasks = () => {
               {Object.values(WEEKDAY).map((day) => (
                 <Chip
                   key={day}
-                  selected={weekRepeat.includes(toWeekDay(day))}
+                  selected={weekRepeat?.includes(toWeekDay(day))}
                   onPress={() => toggleDay(day)}
                 >
                   {day}
