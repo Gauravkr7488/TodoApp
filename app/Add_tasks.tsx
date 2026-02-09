@@ -32,7 +32,7 @@ const Add_tasks = () => {
 
   const [priorityValue, setPriorityValue] = useState<QuadType>(toQuadType(1));
 
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [isArchived, setIsArcived] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [isOnFocus, setIsOnFocus] = useState(false);

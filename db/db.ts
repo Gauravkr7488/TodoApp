@@ -248,4 +248,10 @@ export class Db {
       `);
   }
 
+  protected static async getAllFocusedRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isOnFocus = 1
+      `);
+  }
 }

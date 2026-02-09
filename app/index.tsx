@@ -20,6 +20,7 @@ export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [dbReady, setDbReady] = useState(false);
+  const [checked, setChecked] = useState(false);
   const homeFilter = [
     STRINGS.current,
     STRINGS.all,
@@ -29,8 +30,8 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState(STRINGS.current);
   useEffect(() => {
     const run = async () => {
-      await unarchiveRoutines();
-      await toggleTimedTasks();
+      // await unarchiveRoutines();
+      // await toggleTimedTasks();
       await refreshTasks();
     };
 
@@ -62,25 +63,25 @@ export default function Index() {
   };
 
   // Ensure DB is ready on focus
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      async function fetchTasks() {
-        setDbReady(true);
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     let isActive = true;
+  //     async function fetchTasks() {
+  //       setDbReady(true);
 
-        if (isActive) {
-          const rows = await Dal.getUnarchivedTasksList();
-          setTasks(sortDoneTasks(rows));
-        }
-      }
+  //       if (isActive) {
+  //         const rows = await Dal.getUnarchivedTasksList();
+  //         setTasks(sortDoneTasks(rows));
+  //       }
+  //     }
 
-      fetchTasks();
+  //     fetchTasks();
 
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
+  //     return () => {
+  //       isActive = false;
+  //     };
+  //   }, []),
+  // );
 
   const refreshTasks = async () => {
     // entry point of tasks
@@ -97,6 +98,11 @@ export default function Index() {
 
     if (activeTab == STRINGS.routine) {
       rows = await Dal.getAllTodayRoutines();
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.onfocus){
+      rows = await Dal.getFocusedTasks();
       setTasks(rows);
     }
   };
@@ -163,7 +169,7 @@ export default function Index() {
         onPress={clearCompleted}
         onLongPress={handleReset}
         style={[styles.fab, { bottom: 80 }]}
-        disabled={!dbReady}
+        // disabled={!dbReady}
       />
 
       <FAB
@@ -171,7 +177,7 @@ export default function Index() {
         label="Add"
         onPress={() => router.push("./Add_tasks")}
         style={styles.fab}
-        disabled={!dbReady} // prevent pressing before DB ready
+        // disabled={!dbReady} // prevent pressing before DB ready
       />
     </View>
   );

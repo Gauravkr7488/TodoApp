@@ -1,5 +1,4 @@
 import {
-  IsoDateTime,
   MinutesSinceMidnight,
   MonthDay,
   QuadType,
@@ -12,10 +11,10 @@ import {
   toQuadType,
   toRepeatType,
   toWeekDay,
-  WeekDay,
+  WeekDay
 } from "@/Constants/type";
 import { Db } from "./db";
-import { arrayToCSV, stringToArray, toMinutes } from "./utils";
+import { arrayToCSV, stringToArray } from "./utils";
 
 function mapTaskRowToTask(row: TaskRow): Task {
   return {
@@ -88,7 +87,12 @@ export class Dal extends Db {
     const tasks = await this.getAllNonDoneRows();
     return tasks.map(mapTaskRowToTask);
   }
-  
+
+  static async getFocusedTasks() {
+    const tasks = await this.getAllFocusedRows();
+    return tasks.map(mapTaskRowToTask);
+  }
+
   static async getAllActiveTasks(): Promise<Task[]> {
     const tasks = await this.getAllActiveRows();
     return tasks.map(mapTaskRowToTask);
