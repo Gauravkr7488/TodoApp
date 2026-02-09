@@ -1,39 +1,53 @@
-import { WEEKDAYS } from "@/Constants/strings";
-import { Frequency } from "@/Constants/type";
+import { WEEKDAY } from "@/Constants/strings";
+import {
+  MinutesSinceMidnight,
+  MonthDay,
+  QuadType,
+  RepeatType,
+  toMinutesSinceMidnight,
+  toMonthDay,
+  toQuadType,
+  toRepeatType,
+  toWeekDay,
+  WeekDay,
+} from "@/Constants/type";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import {
-  deleteTaskFromTable,
-  getTask,
-  insertTask,
-  updateTask,
-} from "../db/db";
+import TimePicker from "./Components/dateTimePicker";
+import { Dal } from "@/db/DAL";
+import { Db } from "@/db/db";
+import { formatMinutesToAMPM, toMinutes } from "@/db/utils";
 
 const Add_tasks = () => {
   const router = useRouter();
-  const DAYS = WEEKDAYS;
   const params = useSearchParams();
-  const id = params.get("id");
 
-  // common
+  // Task
+  const id = params.get("id") as unknown as number;
+
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [value, setValue] = useState("");
+  const [description, setDescription] = useState<string>("");
 
-  // routine-specific
-  const [isRoutine, setIsRoutine] = useState(false);
-  const [frequency, setFrequency] = useState<Frequency>("daily");
-  const [days, setDays] = useState<string>("Sun");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  const [priorityValue, setPriorityValue] = useState<QuadType>(toQuadType(1));
+
+  const [isActive, setIsActive] = useState(false);
   const [isArchived, setIsArcived] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+  const [isOnFocus, setIsOnFocus] = useState(false);
+
+  const [repeatType, setRepeatType] = useState<RepeatType | null>(null);
+  const [weekRepeat, setWeekRepeat] = useState<WeekDay[] | null>(null);
+  const [monthRepeat, setMonthRepeat] = useState<MonthDay[] | null>(null);
+
+  const [startTime, setStartTime] = useState<MinutesSinceMidnight | null>(null);
+  const [endTime, setEndTime] = useState<MinutesSinceMidnight | null>(null);
+
   // other stuff
   const inputRef = useRef<any>(null);
-
+  const [isRoutine, setIsRoutine] = useState(false);
   // useEffects
   useEffect(() => {
     const t = setTimeout(() => {
@@ -46,57 +60,70 @@ const Add_tasks = () => {
   useEffect(() => {
     (async () => {
       if (id) {
-        const rows = await getTask(id);
-        if (rows.length) { // load task
-          const task: any = rows[0];
+        const task = await Dal.getTaskById(id);
+        if (task) {
+          // load task
+
           setName(task.name);
-          setDescription(task.description || "");
-          setValue(task.value?.toString() || "0");
-          setIsRoutine(task.is_routine === 1);
-          setFrequency(task.frequency || "");
-          setDays(task.days || "");
-          setStartTime(task.start_time || "");
-          setEndTime(task.end_time || "");
-          setIsActive(task.is_active !== 0);
-          setIsArcived(task.archiveStatus === 1);
+          setDescription(task.description ?? "");
+
+          setPriorityValue(task.priorityValue ?? toQuadType(1));
+
+          setIsActive(task.isActive);
+          setIsArcived(task.isArchived);
+          setIsDone(task.isDone);
+          setIsOnFocus(task.isOnFocus);
+
+          setRepeatType(task.repeatType);
+          setWeekRepeat(task.weekRepeat);
+          setMonthRepeat(task.monthRepeat);
+          setStartTime(task.startTime);
+          setEndTime(task.endTime);
+
+          setIsRoutine(!!task.repeatType);
         }
+        console.log(task);
       }
     })();
   }, [id]);
 
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
-    if (frequency == "weekly" && days == "") return alert("choose a day");
-    const numericValue = parseInt(value) || 9;
+    if (repeatType == "weekly" && !weekRepeat) return alert("choose a day");
+    const numericValue = priorityValue;
 
     if (id) {
       // UPDATE existing task
-      await updateTask(
+      await Dal.updateTaskData(
         name,
         description,
-        numericValue,
-        isRoutine,
-        frequency,
-        days,
-        startTime,
-        endTime,
+        priorityValue,
         isActive,
         isArchived,
+        isDone,
+        isOnFocus,
+        repeatType,
+        weekRepeat,
+        monthRepeat,
+        startTime,
+        endTime,
         id,
       );
     } else {
       // INSERT new task
-      await insertTask(
-        name.trim(),
-        description || null,
-        numericValue,
-        0, // doneStatus
-        isRoutine ? 1 : 0,
-        isRoutine ? frequency || null : null,
-        isRoutine ? days || null : null,
-        isRoutine ? startTime || null : null,
-        isRoutine ? endTime || null : null,
-        isRoutine ? (isActive ? 1 : 0) : null,
+      await Dal.insertTaskDal(
+        name,
+        description,
+        priorityValue,
+        isActive,
+        isArchived,
+        isDone,
+        isOnFocus,
+        repeatType,
+        weekRepeat,
+        monthRepeat,
+        startTime,
+        endTime,
       );
     }
 
@@ -104,21 +131,24 @@ const Add_tasks = () => {
   };
 
   const toggleDay = (day: string) => {
-    setDays((prev) =>
-      prev.includes(day)
-        ? prev
-            .split(",")
-            .filter((d) => d !== day)
-            .join(",")
-        : prev
-          ? `${prev},${day}`
-          : day,
-    );
+    const weekDay = toWeekDay(day); // transform first
+    if (!weekDay) return; // safety if conversion can fail
+
+    setWeekRepeat((prev) => {
+      if (!prev) prev = [];
+      const alreadySelected = prev.includes(weekDay);
+
+      if (alreadySelected) {
+        return prev.filter((d) => d !== weekDay);
+      }
+
+      return [...prev, weekDay];
+    });
   };
 
-  const deleteTask = () => {
+  const handleDeleteTask = () => {
     if (!id) return;
-    deleteTaskFromTable(Number(id));
+    Db.deleteTask(id);
     router.back();
   };
 
@@ -142,40 +172,48 @@ const Add_tasks = () => {
       <TextInput
         label="Value"
         mode="outlined"
-        value={value}
-        onChangeText={setValue}
+        value={priorityValue.toString()}
+        onChangeText={(text) => setPriorityValue(toQuadType(parseInt(text)))}
         keyboardType="numeric"
         style={styles.input}
       />
 
       <View style={styles.switchRow}>
         <Text>Is Routine</Text>
-        <Switch value={isRoutine} onValueChange={setIsRoutine} />
+        <Switch
+          value={isRoutine}
+          onValueChange={(value) => {
+            setIsRoutine(value);
+            setRepeatType(value ? toRepeatType("daily") : null);
+          }}
+        />
       </View>
 
       {isRoutine && (
         <>
           <View style={styles.chipRow}>
             <Chip
-              selected={frequency === "daily"}
-              onPress={() => setFrequency("daily")}
+              selected={repeatType === "daily"}
+              onPress={() => setRepeatType(toRepeatType("daily"))}
             >
               Daily
             </Chip>
             <Chip
-              selected={frequency === "weekly"}
-              onPress={() => setFrequency("weekly")}
+              selected={repeatType === "weekly"}
+              onPress={() => {
+                setRepeatType(toRepeatType("weekly"));
+                setWeekRepeat([toWeekDay(WEEKDAY.Sun)]); // to set default
+              }}
             >
               Weekly
             </Chip>
           </View>
-
-          {frequency === "weekly" && (
+          {repeatType === "weekly" && (
             <View style={styles.chipRow}>
-              {DAYS.map((day) => (
+              {Object.values(WEEKDAY).map((day) => (
                 <Chip
                   key={day}
-                  selected={days.includes(day)}
+                  selected={weekRepeat?.includes(toWeekDay(day))}
                   onPress={() => toggleDay(day)}
                 >
                   {day}
@@ -183,37 +221,48 @@ const Add_tasks = () => {
               ))}
             </View>
           )}
-
-          <TextInput
-            label="Start Time (HH:MM)"
-            mode="outlined"
-            value={startTime}
-            onChangeText={setStartTime}
-            style={styles.input}
+          <TimePicker
+            labelProp="Start Time"
+            value={startTime != null ? formatMinutesToAMPM(startTime) : ""}
+            onChange={(time: string) => {
+              const inMin = toMinutes(time);
+              if (inMin == 0) {
+                alert("12:00 AM cannot be selected.");
+                return;
+              }
+              setStartTime(inMin);
+            }}
           />
-          <TextInput
-            label="End Time (HH:MM)"
-            mode="outlined"
-            value={endTime}
-            onChangeText={setEndTime}
-            style={styles.input}
+          <TimePicker
+            labelProp="End Time"
+            value={endTime != null ? formatMinutesToAMPM(endTime) : ""}
+            onChange={(time: string) => {
+              const inMin = toMinutes(time);
+              if (inMin == 0) {
+                alert("12:00 AM cannot be selected.");
+                return;
+              }
+              setEndTime(inMin);
+            }}
           />
-
-          <View style={styles.switchRow}>
-            <Text>Is Archived</Text>
-            <Switch value={isArchived} onValueChange={setIsArcived} />
-          </View>
-
-          <View style={styles.switchRow}>
-            <Text>Active</Text>
-            <Switch value={isActive} onValueChange={setIsActive} />
-          </View>
         </>
       )}
+      <View style={styles.switchRow}>
+        <Text>Active</Text>
+        <Switch value={isActive} onValueChange={setIsActive} />
+      </View>
+      <View style={styles.switchRow}>
+        <Text>Is Archived</Text>
+        <Switch value={isArchived} onValueChange={setIsArcived} />
+      </View>
+      <View style={styles.switchRow}>
+        <Text>Is Focused</Text>
+        <Switch value={isOnFocus} onValueChange={setIsOnFocus} />
+      </View>
       {id && (
         <FAB
           icon="delete"
-          onPress={deleteTask}
+          onPress={handleDeleteTask}
           style={[styles.fab, { bottom: 80, backgroundColor: "#ef4444" }]}
         />
       )}

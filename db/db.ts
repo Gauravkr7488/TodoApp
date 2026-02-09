@@ -1,190 +1,329 @@
+import { STRINGS } from "@/Constants/strings";
+import { TaskRow } from "@/Constants/type";
 import * as SQLite from "expo-sqlite";
+import { AppState, AppStateStatus } from "react-native";
 
-let db: SQLite.SQLiteDatabase | null = null;
+export class Db {
+  // private static async getDB() {
+  //   const db = await SQLite.openDatabaseAsync("app.db");
+  //   if (!db) throw new Error("DB not initialized");
+  //   return db;    const db: SQLite.SQLiteDatabase
 
-export async function getDB() { // cashing causes freezing issues android kills db in bg
-  return await SQLite.openDatabaseAsync("app.db");;
-}
+  //   // return await SQLite.opend("app.db");
+  // }
+  // private static async getDB() {
+  //   try {
+  //     const db = await SQLite.openDatabaseAsync("app.db");
+  //     return db;
+  //   } catch (e: unknown) {
+  //     console.error("Failed to open DB:", e);
+  //     throw new Error(e instanceof Error ? e.message : String(e));
+  //   }
+  // }
+  public static attachAppStateListener() {
+    AppState.addEventListener(
+      "change",
+      async (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active") {
+          // Reopen DB if app resumed
+          // await TaskDB.ensureDB();
+          this.db = await SQLite.openDatabaseAsync("app.db");
+        }
+      },
+    );
+  }
 
-async function initDB() {
-  const database = await getDB();
-  await database.execAsync(`
-    PRAGMA journal_mode = WAL;
+  private static db: SQLite.SQLiteDatabase | null = null;
 
-    CREATE TABLE IF NOT EXISTS tasks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT,
+  private static async getDB() {
+    if (this.db) return this.db;
+    try {
+      this.db = await SQLite.openDatabaseAsync("app.db");
+      return this.db;
+    } catch (e: unknown) {
+      console.error("Failed to open DB:", e);
+      throw new Error(e instanceof Error ? e.message : String(e));
+    }
+  }
 
-      -- task fields
-      value INTEGER NOT NULL DEFAULT 9,
-      doneStatus INTEGER NOT NULL DEFAULT 0,
-      archiveStatus INTEGER NOT NULL DEFAULT 0,
+  private static async initDB() {
+    const db = await this.getDB();
+    await db.execAsync(
+      `
+        PRAGMA journal_mode = WAL;
 
-      -- routine fields (NULL = normal task)
-      is_routine INTEGER NOT NULL DEFAULT 0,
-      frequency TEXT,
-      days TEXT,
-      start_time TEXT,
-      end_time TEXT,
-      is_active INTEGER,
+        CREATE TABLE IF NOT EXISTS TASKS (
+            id INTEGER PRIMARY KEY,
+            
+            name TEXT NOT NULL,
+            description TEXT,
 
-      created_at INTEGER NOT NULL
+            priorityValue INTEGER,
+
+            isDone INTEGER NOT NULL,
+            isArchived INTEGER NOT NULL,
+            isActive INTEGER NOT NULL,
+            isOnFocus INTEGER NOT NULL,
+
+            repeatType TEXT,
+            weekRepeat TEXT,
+            monthRepeat TEXT,
+
+            startTime INTEGER,
+            endTime INTEGER,
+            
+            createdAt TEXT NOT NULL
+        );
+
+      `,
+    );
+  }
+
+  static async toggleDoneStatus(taskId: number, doneStatus: boolean) {
+    const database = await this.getDB();
+    await database.runAsync(
+      `UPDATE tasks SET isDone = ? WHERE id = ?`,
+      doneStatus ? 1 : 0,
+      taskId,
+    );
+  }
+
+  protected static async insertTask(task: TaskRow) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `
+        INSERT INTO TASKS (
+          name,
+          description,
+          priorityValue,
+          isDone,
+          isArchived,
+          isActive,
+          isOnFocus,
+          repeatType,
+          weekRepeat,
+          monthRepeat,
+          startTime,
+          endTime,
+          createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      `,
+      task.name,
+      task.description,
+      task.priorityValue,
+      task.isDone,
+      task.isArchived,
+      task.isActive,
+      task.isOnFocus,
+      task.repeatType,
+      task.weekRepeat,
+      task.monthRepeat,
+      task.startTime,
+      task.endTime,
+      task.createdAt, // todo
+    );
+  }
+  protected static async updateTask(task: TaskRow) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `
+       UPDATE TASKS
+        SET
+          name = ?,
+          description = ?,
+          priorityValue = ?,
+          isDone = ?,
+          isArchived = ?,
+          isActive = ?,
+          isOnFocus = ?,
+          repeatType = ?,
+          weekRepeat = ?,
+          monthRepeat = ?,
+          startTime = ?,
+          endTime = ?
+        WHERE id = ?;
+
+      `,
+      task.name,
+      task.description,
+      task.priorityValue,
+      task.isDone,
+      task.isArchived,
+      task.isActive,
+      task.isOnFocus,
+      task.repeatType,
+      task.weekRepeat,
+      task.monthRepeat,
+      task.startTime,
+      task.endTime,
+      task.id,
+    );
+    console.log(task);
+  }
+
+  static async archiveCompletedTasks() {
+    const database = await this.getDB();
+    await database.runAsync(
+      `UPDATE TASKS
+     SET isArchived = 1, isActive = 0
+     WHERE isDone = 1 AND isArchived = 0`,
+    );
+  }
+  static async unarchiveDailyRoutines() {
+    const db = await this.getDB();
+    await db.runAsync(`
+      UPDATE TASKS
+      SET isArchived = 0, isDone = 0
+      WHERE repeatType = 'daily'
+    `);
+  }
+  static async resetDB() {
+    // For testing
+    const database = await this.getDB();
+    await database.execAsync(`DROP TABLE IF EXISTS TASKS;`);
+    await this.initDB();
+  }
+
+  protected static async getUnarchivedTasks() {
+    const database = await this.getDB();
+    return database.getAllAsync<TaskRow>(
+      `SELECT *
+     FROM TASKS
+     WHERE isArchived = 0`,
+    );
+  }
+
+  protected static async getTask(id: number) {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(
+      "SELECT * FROM TASKS WHERE id = ?",
+      Number(id),
+    );
+  }
+
+  public static async deleteTask(id: number) {
+    const db = await this.getDB();
+    return await db.runAsync(`DELETE FROM TASKS WHERE id = ?`, id);
+  }
+
+  public static async unarchiveWeeklyRoutinesDB(day: string) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `
+        UPDATE TASKS
+        SET isArchived = 0, isDone = 0
+        WHERE repeatType = 'weekly' AND weekRepeat LIKE ?
+      `,
+      [`%${day}%`],
+    );
+  }
+
+  protected static async getRepeatTypeRows() {
+    const db = await this.getDB();
+    return db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS
+        WHERE repeatType IS NOT NULL
+      `);
+  }
+
+  static async archiveTask(id: number) {
+    const db = await this.getDB();
+    await db.runAsync(`UPDATE TASKS SET isArchived = 1 WHERE id = ?`, id);
+  }
+
+  static async unarchiveTask(id: number) {
+    const db = await this.getDB();
+    await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id);
+  }
+
+  protected static async getFilteredRows(
+    includeFilter: string[] = [],
+    excludeFilter: string[] = [],
+  ) {
+    const db = await this.getDB();
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+
+    if (includeFilter.includes(STRINGS.archived)) {
+      conditions.push(`isArchived = ?`);
+      params.push(1);
+    }
+    if (excludeFilter.includes(STRINGS.archived)) {
+      conditions.push(`isArchived = ?`);
+      params.push(0);
+    }
+
+    if (includeFilter.includes(STRINGS.routine)) {
+      conditions.push(`repeatType IS NOT NULL`);
+    }
+
+    if (excludeFilter.includes(STRINGS.routine)) {
+      conditions.push(`repeatType IS NULL`);
+    }
+
+    const query =
+      `SELECT * FROM TASKS` +
+      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``) +
+      ` ORDER BY id DESC LIMIT 100;`;
+
+    let c = await db.getAllAsync<TaskRow>(query, params);
+    // console.log(c[0]);
+
+    return c;
+  }
+
+  protected static async getAllActiveRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isActive = 1
+      `);
+  }
+
+  protected static async getAllNonDoneRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isDone = 0
+      `);
+  }
+
+  protected static async getAllFocusedRows() {
+    const db = await this.getDB();
+    return await db.getAllAsync<TaskRow>(`
+        SELECT * FROM TASKS WHERE isOnFocus = 1
+      `);
+  }
+
+  static async toggleTimedTasks(nowMinutes: number) {
+    const db = await this.getDB();
+    const unarchiveActiveTasks = await this.getUnarchivedTasks();
+    const activeTasks = unarchiveActiveTasks.filter(
+      (task) =>
+        task.startTime != null &&
+        task.endTime != null &&
+        task.startTime <= nowMinutes &&
+        task.endTime >= nowMinutes,
     );
 
-  `);
+    const notActiveTasks = unarchiveActiveTasks.filter(
+      (task) =>
+        (task.startTime != null && task.startTime > nowMinutes) ||
+        (task.endTime != null && task.endTime < nowMinutes),
+    );
+    await Promise.all(
+      activeTasks.map((task) => this.toggleActiveStatus(1, task.id)),
+    );
+    await Promise.all(
+      notActiveTasks.map((task) => this.toggleActiveStatus(0, task.id)),
+    );
+  }
 
-  await database.execAsync(``);
-}
-
-export async function toggleDoneStatus(taskId: number, doneStatus: boolean) {
-  const database = await getDB();
-  await database.runAsync(
-    `UPDATE tasks SET doneStatus = ? WHERE id = ?`,
-    doneStatus ? 1 : 0,
-    taskId,
-  );
-}
-
-export async function insertTask(
-  name: string,
-  description: string | null = null,
-
-  // task fields
-  value: number = 9,
-  doneStatus: number = 0,
-
-  // routine fields
-  is_routine: number = 0,
-  frequency: string | null = null,
-  days: string | null = null,
-  start_time: string | null = null,
-  end_time: string | null = null,
-  is_active: number | null = null,
-) {
-  const database = await getDB();
-  await database.runAsync(
-    `INSERT INTO tasks (
-      name,
-      description,
-      value,
-      doneStatus,
-      is_routine,
-      frequency,
-      days,
-      start_time,
-      end_time,
-      is_active,
-      created_at
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    name,
-    description,
-    value,
-    doneStatus,
-    is_routine,
-    frequency,
-    days,
-    start_time,
-    end_time,
-    is_active,
-    Date.now(),
-  );
-}
-
-export async function getUnarchivedTasks() {
-  const database = await getDB();
-  return database.getAllAsync(
-    `SELECT id, name, doneStatus
-     FROM tasks
-     WHERE archiveStatus = 0
-     ORDER BY created_at DESC`,
-  );
-}
-
-export async function archiveCompletedTasks() {
-  const database = await getDB();
-  await database.runAsync(
-    `UPDATE tasks
-     SET archiveStatus = 1
-     WHERE doneStatus = 1 AND archiveStatus = 0`,
-  );
-}
-
-export async function resetDB() {
-  const database = await getDB();
-  await database.execAsync(`
-    DROP TABLE IF EXISTS tasks;
-    DROP TABLE IF EXISTS routines;
-  `);
-  await initDB();
-}
-
-export async function unarchiveDailyRoutines() {
-  const db = await getDB();
-
-  await db.runAsync(`
-  UPDATE tasks
-  SET archiveStatus = 0, doneStatus = 0
-  WHERE is_routine = 1
-    AND frequency = 'daily'
-  `);
-}
-
-export async function unarchiveWeeklyRoutines(day: string) {
-  const db = await getDB();
-  await db.runAsync(
-    `
-    UPDATE tasks
-    SET archiveStatus = 0, doneStatus = 0
-    WHERE is_routine = 1
-      AND frequency = 'weekly'
-      AND days LIKE ?
-    `,
-    `%${day}%`,
-  );
-}
-
-export async function deleteTaskFromTable(id: number) {
-  const db = await getDB();
-
-  await db.runAsync(`DELETE FROM tasks WHERE id = ?`, id);
-}
-export async function updateTask(
-  name: string,
-  description: string,
-  numericValue: number,
-  isRoutine: boolean,
-  frequency: string,
-  days: string,
-  startTime: string,
-  endTime: string,
-  isActive: boolean,
-  isArchived: boolean,
-  id: string,
-) {
-  const db = await getDB();
-  await db.runAsync(
-    `UPDATE tasks SET 
-        name = ?, description = ?, value = ?, 
-        is_routine = ?, frequency = ?, days = ?, 
-        start_time = ?, end_time = ?, is_active = ? ,
-        archiveStatus = ?
-       WHERE id = ?`,
-    name.trim(),
-    description || null,
-    numericValue,
-    isRoutine ? 1 : 0,
-    isRoutine ? frequency || null : null,
-    isRoutine ? days || null : null,
-    isRoutine ? startTime || null : null,
-    isRoutine ? endTime || null : null,
-    isRoutine ? (isActive ? 1 : 0) : null,
-    isArchived ? 1 : 0,
-    Number(id),
-  );
-}
-export async function getTask(id: string) {
-  const db = await getDB();
-  return await db.getAllAsync("SELECT * FROM tasks WHERE id = ?", Number(id));
+  static async toggleActiveStatus(isActive: number, id: number) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `UPDATE TASKS SET isActive = ? WHERE id = ?`,
+      isActive,
+      id,
+    );
+  }
 }

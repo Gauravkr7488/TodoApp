@@ -1,12 +1,15 @@
+import { Task } from "@/Constants/type";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { unarchiveDailyRoutines, unarchiveWeeklyRoutines } from "./db";
+import { Dal } from "./DAL";
+import { Db } from "./db";
 
 const UNARCHIVE_KEY = "last_unarchive_date";
 
-export async function unarchiveRoutines() {
+async function unarchiveRoutinesForToday() {
   const today = new Date();
   const todayISO = today.toISOString().slice(0, 10);
 
+  // await toggleTimedTasks(today);
   const lastRun = await AsyncStorage.getItem(UNARCHIVE_KEY);
 
   if (!lastRun) {
@@ -14,9 +17,9 @@ export async function unarchiveRoutines() {
     return;
   }
 
-  if(lastRun === todayISO) return;
+  if (lastRun === todayISO) return;
 
-  await unarchiveDailyRoutines();
+  await Db.unarchiveDailyRoutines();
 
   // weekly logic
   const cursor = new Date(lastRun);
@@ -24,9 +27,53 @@ export async function unarchiveRoutines() {
 
   while (cursor <= today) {
     const day = cursor.toLocaleDateString("en-US", { weekday: "short" });
-    await unarchiveWeeklyRoutines(day);
+    await Db.unarchiveWeeklyRoutinesDB(day);
     cursor.setDate(cursor.getDate() + 1);
   }
 
   await AsyncStorage.setItem(UNARCHIVE_KEY, todayISO);
+}
+
+export async function toggleRoutines() {
+  await unarchiveRoutinesForToday(); // goes in all and routines
+  
+  const today = new Date();
+  const nowMinutes = today.getHours() * 60 + today.getMinutes();
+  await Db.toggleTimedTasks(nowMinutes);
+}
+
+// async function toggleTimedTasks() {
+//   const today = new Date();
+//   const nowMinutes = today.getHours() * 60 + today.getMinutes();
+
+//   await toggleUnarchivedTasks(nowMinutes)
+// }
+async function archiveNonActiveTasks(
+  nowMinutes: number,
+  end: number,
+  task: Task,
+) {
+  if (nowMinutes > end) {
+    // edge case
+    await Db.archiveTask(task.id); // function to archive single task
+  }
+}
+
+async function unarchiveActiveTasks(
+  nowMinutes: number,
+  start: number,
+  end: number,
+  task: Task,
+  today: Date,
+) {
+  if (nowMinutes < start || nowMinutes > end) return; // not active
+
+  if (task.repeatType !== "weekly") {
+    await Db.unarchiveTask(task.id); // unarchive non-weekly tasks
+  } else {
+    const day = today.toLocaleDateString("en-US", { weekday: "short" });
+    // if (await matchWeekDay(day, task.id)) { // this is faulty anyways
+    //   await Db.unarchiveTask(task.id); // only unarchive weekly task if today matches
+    // }
+  }
 }

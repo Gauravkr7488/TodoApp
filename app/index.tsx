@@ -1,6 +1,9 @@
-import { unarchiveRoutines } from "@/db/routines";
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { STRINGS } from "@/Constants/strings";
+import { Task } from "@/Constants/type";
+import { Dal } from "@/db/DAL";
+import { toggleRoutines } from "@/db/routines";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -10,74 +13,77 @@ import {
   View,
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
-import {
-  archiveCompletedTasks,
-  getUnarchivedTasks,
-  resetDB,
-  toggleDoneStatus,
-} from "../db/db";
+import { Db } from "../db/db";
+import Tabs from "./Components/tabs";
 
 export default function Index() {
   const router = useRouter();
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [dbReady, setDbReady] = useState(false);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const homeFilter = [
+    STRINGS.current,
+    STRINGS.all,
+    STRINGS.routine,
+    STRINGS.onfocus,
+  ];
+  const [activeTab, setActiveTab] = useState(STRINGS.current);
   useEffect(() => {
     const run = async () => {
-      await unarchiveRoutines();
+      await refreshTasks();
     };
 
     run();
-  }, []);
+  }, [activeTab]);
 
   const clearCompleted = async () => {
-    await archiveCompletedTasks();
-
-    const rows = await getUnarchivedTasks();
-    setTasks(sortDoneTasks(rows));
+    await Db.archiveCompletedTasks();
+    await refreshTasks();
   };
 
-  const sortDoneTasks = (rows: any[]) =>
-    [...rows].sort((a, b) => a.doneStatus - b.doneStatus);
+  const sortDoneTasks = (rows: Task[]) =>
+    [...rows].sort((a, b) => Number(a.isDone) - Number(b.isDone));
 
-  const onToggle = async (item: any) => {
-    const newStatus = item.doneStatus === 0 ? 1 : 0;
+  const handleCheckToggle = async (item: Task) => {
+    const newStatus = Number(item.isDone) === 0 ? 1 : 0;
 
-    await toggleDoneStatus(item.id, newStatus === 1);
+    await Db.toggleDoneStatus(item.id, newStatus === 1);
 
     setTasks((prev) =>
       sortDoneTasks(
         prev.map((t) =>
-          t.id === item.id ? { ...t, doneStatus: newStatus } : t,
+          t.id === item.id ? { ...t, isDone: Boolean(newStatus) } : t,
         ),
       ),
     );
   };
 
-  // Ensure DB is ready on focus
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      async function fetchTasks() {
-        setDbReady(true);
-
-        if (isActive) {
-          const rows = await getUnarchivedTasks();
-          setTasks(sortDoneTasks(rows));
-        }
-      }
-
-      fetchTasks();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
-
   const refreshTasks = async () => {
-    const rows = await getUnarchivedTasks();
-    setTasks(rows);
+    // entry point of tasks
+    let rows: Task[] = [];
+    await toggleRoutines();
+
+    if (activeTab == STRINGS.current) {
+      let rows = await Dal.getAllActiveTasks();
+      rows = rows.filter((row) => row.isArchived !== true); // only not archived
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.all) {
+      rows = await Dal.getAllNonDoneTask();
+      rows = rows.filter((row) => row.isArchived !== true);
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.routine) {
+      rows = await Dal.getAllTodayRoutines();
+      rows = rows.filter((row) => row.isArchived !== true);
+      setTasks(rows);
+    }
+
+    if (activeTab == STRINGS.onfocus) {
+      rows = await Dal.getFocusedTasks();
+      rows = rows.filter((row) => row.isArchived !== true);
+      setTasks(rows);
+    }
   };
 
   const handleReset = () => {
@@ -90,7 +96,7 @@ export default function Index() {
           text: "Reset",
           style: "destructive",
           onPress: async () => {
-            await resetDB();
+            await Db.resetDB();
             await refreshTasks();
           },
         },
@@ -100,25 +106,33 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      <Tabs
+        tabs={homeFilter}
+        activeTab={activeTab}
+        onChange={async (value) => {
+          setActiveTab(value);
+        }}
+      />
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Checkbox
-              status={item.doneStatus ? "checked" : "unchecked"}
-              onPress={() => onToggle(item)}
+              status={item.isDone ? "checked" : "unchecked"}
+              onPress={() => handleCheckToggle(item)}
             />
             <Pressable
-              onPress={() =>
-              {
-                if(!item.doneStatus){
-                  router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+              onPress={() => {
+                if (!item.isDone) {
+                  router.push({
+                    pathname: "/Add_tasks",
+                    params: { id: item.id },
+                  });
                 }
-              }
-              }
+              }}
             >
-              <Text style={[styles.item, item.doneStatus && styles.done]}>
+              <Text style={[styles.item, item.isDone && styles.done]}>
                 {item.name}
               </Text>
             </Pressable>
@@ -131,10 +145,10 @@ export default function Index() {
       <FAB
         icon="delete"
         label="Clear"
-        onPress={clearCompleted}
+        onPress={async () => await clearCompleted()}
         onLongPress={handleReset}
         style={[styles.fab, { bottom: 80 }]}
-        disabled={!dbReady}
+        // disabled={!dbReady}
       />
 
       <FAB
@@ -142,7 +156,7 @@ export default function Index() {
         label="Add"
         onPress={() => router.push("./Add_tasks")}
         style={styles.fab}
-        disabled={!dbReady} // prevent pressing before DB ready
+        // disabled={!dbReady} // prevent pressing before DB ready
       />
     </View>
   );
