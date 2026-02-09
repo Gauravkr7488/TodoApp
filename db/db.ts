@@ -165,7 +165,7 @@ export class Db {
     const database = await this.getDB();
     await database.runAsync(
       `UPDATE TASKS
-     SET isArchived = 1
+     SET isArchived = 1, isActive = 0
      WHERE isDone = 1 AND isArchived = 0`,
     );
   }

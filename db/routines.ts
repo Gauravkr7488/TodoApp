@@ -40,23 +40,6 @@ export async function toggleRoutines() {
   const today = new Date();
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
   await Db.toggleTimedTasks(nowMinutes);
-
-  // const tasks = await Dal.getRoutines();
-
-  // if it is marked daily and its not done yet
-  // if its weekly and today is the day
-  // if its in the time range
-  // for (const task of tasks) {
-  //   if (!task.startTime || !task.endTime) continue;
-  //   await unarchiveActiveTasks(
-  //     nowMinutes,
-  //     task.startTime,
-  //     task.endTime,
-  //     task,
-  //     today,
-  //   );
-  //   await archiveNonActiveTasks(nowMinutes, task.endTime, task);
-  // }
 }
 
 // async function toggleTimedTasks() {

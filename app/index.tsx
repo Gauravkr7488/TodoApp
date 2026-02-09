@@ -36,15 +36,13 @@ export default function Index() {
 
   const clearCompleted = async () => {
     await Db.archiveCompletedTasks();
-
-    const rows = await Dal.getUnarchivedTasksList();
-    setTasks(sortDoneTasks(rows));
+    await refreshTasks();
   };
 
   const sortDoneTasks = (rows: Task[]) =>
     [...rows].sort((a, b) => Number(a.isDone) - Number(b.isDone));
 
-  const onToggle = async (item: Task) => {
+  const handleCheckToggle = async (item: Task) => {
     const newStatus = Number(item.isDone) === 0 ? 1 : 0;
 
     await Db.toggleDoneStatus(item.id, newStatus === 1);
@@ -66,6 +64,7 @@ export default function Index() {
     if (activeTab == STRINGS.current) {
       rows = await Dal.getAllActiveTasks();
       setTasks(rows);
+      console.log(rows);
     }
 
     if (activeTab == STRINGS.all) {
@@ -118,7 +117,7 @@ export default function Index() {
           <View style={styles.row}>
             <Checkbox
               status={item.isDone ? "checked" : "unchecked"}
-              onPress={() => onToggle(item)}
+              onPress={() => handleCheckToggle(item)}
             />
             <Pressable
               onPress={() => {
@@ -143,7 +142,7 @@ export default function Index() {
       <FAB
         icon="delete"
         label="Clear"
-        onPress={clearCompleted}
+        onPress={async() => await clearCompleted()}
         onLongPress={handleReset}
         style={[styles.fab, { bottom: 80 }]}
         // disabled={!dbReady}
