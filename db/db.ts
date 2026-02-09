@@ -224,10 +224,10 @@ export class Db {
 
     const query =
       `SELECT * FROM TASKS` +
-      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``);
+      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ` ORDER BY id DESC LIMIT 100;`);
 
     let c = await db.getAllAsync<TaskRow>(query, params);
-    console.log(c[0]);
+    // console.log(c[0]);
     
     return c;
   }

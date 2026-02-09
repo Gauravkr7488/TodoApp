@@ -137,7 +137,7 @@ export class Dal extends Db {
       startTime,
       endTime,
     );
-    console.log(task);
+    // console.log(task);
 
     await this.insertTask(mapTaskTotaskRow(task));
   }
