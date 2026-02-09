@@ -158,6 +158,14 @@ export class Dal extends Db {
     const tasks = await this.getRepeatTasksDB();
     return tasks.map(mapTaskRowToTask);
   }
+
+  static async getFilteredTasks(
+    includeFilter: string[] = [],
+    excludeFilter: string[] = [],
+  ) {
+    const rows = await this.getFilteredRows(includeFilter, excludeFilter);
+    return rows.map(mapTaskRowToTask);
+  }
 }
 
 function createTask(

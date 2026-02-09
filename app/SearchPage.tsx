@@ -1,5 +1,5 @@
 import { STRINGS } from "@/Constants/strings";
-import { getFilteredTasks } from "@/db/filter";
+import { Dal } from "@/db/DAL";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
@@ -9,31 +9,53 @@ export default function TaskPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<any[]>([]);
   const [text, setText] = useState("");
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [includeFilters, setIncludeFilters] = useState<string[]>([]);
+  const [excludeFilters, setExcludeFilters] = useState<string[]>([]);
   const searchFilters = [STRINGS.archived, STRINGS.routine];
 
-  const refreshTasks = async (activeFilters: string[]) => {
-    const tasks = await getFilteredTasks(activeFilters);
+  const refreshTasks = async (
+    includeFilters: string[],
+    excludeFilters: string[],
+  ) => {
+    const tasks = await Dal.getFilteredTasks(includeFilters, excludeFilters);
     setTasks(tasks);
   };
   useEffect(() => {
-    refreshTasks(activeFilters);
-  }, [activeFilters]);
+    refreshTasks(includeFilters, excludeFilters);
+  }, [includeFilters]);
 
-  const toggleFilter = (filter: string) => {
-    setActiveFilters((previousFilters) => {
-      const isActive = previousFilters.includes(filter);
+  // const toggleFilter = (filter: string) => {
+  //   setIncludeFilters((previousFilters) => {
+  //     const isActive = previousFilters.includes(filter);
 
-      if (isActive) {
-        // remove filter
-        return previousFilters.filter(
-          (existingFilter) => existingFilter !== filter,
-        );
-      }
+  //     if (isActive) {
+  //       // remove filter
+  //       return previousFilters.filter(
+  //         (existingFilter) => existingFilter !== filter,
+  //       );
+  //     }
 
-      // add filter
-      return [...previousFilters, filter];
-    });
+  //     // add filter
+  //     return [...previousFilters, filter];
+  //   });
+  // };
+
+  const onFilterPress = (filter: string) => {
+    if (includeFilters.includes(filter)) {
+      // move include → exclude
+      setIncludeFilters((prev) => prev.filter((f) => f !== filter));
+      setExcludeFilters((prev) => [...prev, filter]);
+      return;
+    }
+
+    if (excludeFilters.includes(filter)) {
+      // remove from exclude → none
+      setExcludeFilters((prev) => prev.filter((f) => f !== filter));
+      return;
+    }
+
+    // none → include
+    setIncludeFilters((prev) => [...prev, filter]);
   };
 
   return (
@@ -43,9 +65,9 @@ export default function TaskPage() {
         {searchFilters.map((filter) => (
           <Chip
             key={filter}
-            selected={activeFilters.includes(filter)}
+            selected={includeFilters.includes(filter)}
             onPress={() => {
-              toggleFilter(filter);
+              onFilterPress(filter);
             }}
           >
             {filter}

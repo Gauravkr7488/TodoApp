@@ -196,7 +196,7 @@ export class Db {
     await db.runAsync(`UPDATE TASKS SET isArchived = 0 WHERE id = ?`, id);
   }
 
-  static async getFilteredTasks(
+  protected static async getFilteredRows(
     includeFilter: string[] = [],
     excludeFilter: string[] = [],
   ) {
@@ -222,6 +222,6 @@ export class Db {
       `SELECT * FROM TASKS` +
       (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``);
 
-    return await db.getAllAsync(query, params);
+    return await db.getAllAsync<TaskRow>(query, params);
   }
 }
