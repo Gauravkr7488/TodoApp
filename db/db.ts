@@ -209,6 +209,10 @@ export class Db {
       conditions.push(`isArchived = ?`);
       params.push(1);
     }
+    if (excludeFilter.includes(STRINGS.archived)) {
+      conditions.push(`isArchived = ?`);
+      params.push(0);
+    }
 
     if (includeFilter.includes(STRINGS.routine)) {
       conditions.push(`repeatType IS NOT NULL`);
@@ -223,7 +227,7 @@ export class Db {
       (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``);
 
     let c = await db.getAllAsync<TaskRow>(query, params);
-    console.log(includeFilter, excludeFilter,"rep:", c[0].name,c[0].repeatType);
+    console.log(c[0]);
     
     return c;
   }
