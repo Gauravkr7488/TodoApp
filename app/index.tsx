@@ -13,6 +13,8 @@ import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../db/db";
 import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
+import { STRINGS } from "@/Constants/strings";
+import Tabs from "./Components/tabs";
 
 export default function Index() {
   const router = useRouter();
@@ -95,9 +97,11 @@ export default function Index() {
       ],
     );
   };
-
+  const homeFilter = [STRINGS.all ,STRINGS.routine, STRINGS.onfocus];
+  const [activeTab, setActiveTab] = useState(STRINGS.onfocus);
   return (
     <View style={styles.container}>
+      <Tabs tabs={homeFilter} activeTab={activeTab} onChange={setActiveTab} />
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
