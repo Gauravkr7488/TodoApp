@@ -110,6 +110,7 @@ export class Dal extends Db {
     monthRepeat: MonthDay[] | null,
     startTime: MinutesSinceMidnight | null,
     endTime: MinutesSinceMidnight | null,
+    id: number,
   ) {
     const task = createTask(
       name,
@@ -124,6 +125,7 @@ export class Dal extends Db {
       monthRepeat,
       startTime,
       endTime,
+      id,
     );
     await this.updateTask(mapTaskTotaskRow(task));
   }

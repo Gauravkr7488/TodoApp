@@ -1,11 +1,49 @@
 import { STRINGS } from "@/Constants/strings";
 import { TaskRow } from "@/Constants/type";
 import * as SQLite from "expo-sqlite";
+import { AppState, AppStateStatus } from "react-native";
 
 export class Db {
+  // private static async getDB() {
+  //   const db = await SQLite.openDatabaseAsync("app.db");
+  //   if (!db) throw new Error("DB not initialized");
+  //   return db;    const db: SQLite.SQLiteDatabase
+
+  //   // return await SQLite.opend("app.db");
+  // }
+  // private static async getDB() {
+  //   try {
+  //     const db = await SQLite.openDatabaseAsync("app.db");
+  //     return db;
+  //   } catch (e: unknown) {
+  //     console.error("Failed to open DB:", e);
+  //     throw new Error(e instanceof Error ? e.message : String(e));
+  //   }
+  // }
+  public static attachAppStateListener() {
+    AppState.addEventListener(
+      "change",
+      async (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active") {
+          // Reopen DB if app resumed
+          // await TaskDB.ensureDB();
+          this.db = await SQLite.openDatabaseAsync("app.db");
+        }
+      },
+    );
+  }
+
+  private static db: SQLite.SQLiteDatabase | null = null;
+
   private static async getDB() {
-    return await SQLite.openDatabaseAsync("app.db");
-    // return await SQLite.opend("app.db");
+    if (this.db) return this.db;
+    try {
+      this.db = await SQLite.openDatabaseAsync("app.db");
+      return this.db;
+    } catch (e: unknown) {
+      console.error("Failed to open DB:", e);
+      throw new Error(e instanceof Error ? e.message : String(e));
+    }
   }
 
   private static async initDB() {
@@ -120,6 +158,7 @@ export class Db {
       task.endTime,
       task.id,
     );
+    console.log(task);
   }
 
   static async archiveCompletedTasks() {
@@ -225,9 +264,8 @@ export class Db {
 
     const query =
       `SELECT * FROM TASKS` +
-      (conditions.length
-        ? ` WHERE ` + conditions.join(` AND `)
-        : ` ORDER BY id DESC LIMIT 100;`);
+      (conditions.length ? ` WHERE ` + conditions.join(` AND `) : ``) +
+      ` ORDER BY id DESC LIMIT 100;`;
 
     let c = await db.getAllAsync<TaskRow>(query, params);
     // console.log(c[0]);

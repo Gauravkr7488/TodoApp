@@ -105,6 +105,7 @@ const Add_tasks = () => {
         monthRepeat,
         startTime,
         endTime,
+        id,
       );
     } else {
       // INSERT new task
