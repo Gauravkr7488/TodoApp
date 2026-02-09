@@ -62,23 +62,26 @@ export default function Index() {
     await toggleRoutines();
 
     if (activeTab == STRINGS.current) {
-      rows = await Dal.getAllActiveTasks();
+      let rows = await Dal.getAllActiveTasks();
+      rows = rows.filter((row) => row.isArchived !== true); // only not archived
       setTasks(rows);
-      console.log(rows);
     }
 
     if (activeTab == STRINGS.all) {
       rows = await Dal.getAllNonDoneTask();
+      rows = rows.filter((row) => row.isArchived !== true);
       setTasks(rows);
     }
 
     if (activeTab == STRINGS.routine) {
       rows = await Dal.getAllTodayRoutines();
+      rows = rows.filter((row) => row.isArchived !== true);
       setTasks(rows);
     }
 
     if (activeTab == STRINGS.onfocus) {
       rows = await Dal.getFocusedTasks();
+      rows = rows.filter((row) => row.isArchived !== true);
       setTasks(rows);
     }
   };
@@ -142,7 +145,7 @@ export default function Index() {
       <FAB
         icon="delete"
         label="Clear"
-        onPress={async() => await clearCompleted()}
+        onPress={async () => await clearCompleted()}
         onLongPress={handleReset}
         style={[styles.fab, { bottom: 80 }]}
         // disabled={!dbReady}
