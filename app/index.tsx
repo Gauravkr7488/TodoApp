@@ -21,12 +21,12 @@ export default function Index() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [dbReady, setDbReady] = useState(false);
   const homeFilter = [
+    STRINGS.current,
     STRINGS.all,
     STRINGS.routine,
     STRINGS.onfocus,
-    STRINGS.current,
   ];
-  const [activeTab, setActiveTab] = useState(STRINGS.onfocus);
+  const [activeTab, setActiveTab] = useState(STRINGS.current);
   useEffect(() => {
     const run = async () => {
       await unarchiveRoutines();
