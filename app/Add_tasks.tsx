@@ -2,11 +2,9 @@ import { WEEKDAY } from "@/Constants/strings";
 import {
   MinutesSinceMidnight,
   MonthDay,
-  QuadType,
   RepeatType,
   toMinutesSinceMidnight,
   toMonthDay,
-  toQuadType,
   toRepeatType,
   toWeekDay,
   WeekDay,
@@ -30,8 +28,6 @@ const Add_tasks = () => {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState<string>("");
-
-  const [priorityValue, setPriorityValue] = useState<QuadType>(toQuadType(1));
 
   const [isActive, setIsActive] = useState(false);
   const [isArchived, setIsArcived] = useState(false);
@@ -67,7 +63,6 @@ const Add_tasks = () => {
           setName(task.name);
           setDescription(task.description ?? "");
 
-          setPriorityValue(task.priorityValue ?? toQuadType(1));
 
           setIsActive(task.isActive);
           setIsArcived(task.isArchived);
@@ -90,14 +85,12 @@ const Add_tasks = () => {
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
     if (repeatType == "weekly" && !weekRepeat) return alert("choose a day");
-    const numericValue = priorityValue;
 
     if (id) {
       // UPDATE existing task
       await Dal.updateTaskData(
         name,
         description,
-        priorityValue,
         isActive,
         isArchived,
         isDone,
@@ -114,7 +107,6 @@ const Add_tasks = () => {
       await Dal.insertTaskDal(
         name,
         description,
-        priorityValue,
         isActive,
         isArchived,
         isDone,
@@ -167,14 +159,6 @@ const Add_tasks = () => {
         mode="outlined"
         value={description}
         onChangeText={setDescription}
-        style={styles.input}
-      />
-      <TextInput
-        label="Value"
-        mode="outlined"
-        value={priorityValue.toString()}
-        onChangeText={(text) => setPriorityValue(toQuadType(parseInt(text)))}
-        keyboardType="numeric"
         style={styles.input}
       />
 

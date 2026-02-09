@@ -4,7 +4,6 @@ export type Task = {
   name: string;
   description: string | null;
 
-  priorityValue: QuadType | null;
 
   isDone: boolean;
   isArchived: boolean; // for the routines that are not being used
@@ -27,7 +26,6 @@ export type TaskRow = {
   name: string;
   description: string | null;
 
-  priorityValue: number | null;
 
   isDone: number;
   isArchived: number;
@@ -48,16 +46,6 @@ export type TaskRow = {
  * @description Should be created using `toIsoDateTime(value: string)`
  */
 export type IsoDateTime = string & { readonly __brand: unique symbol };
-
-/**
- * @description Should be created using `toQuadType(value: number)`
- */
-export type QuadType = number & { readonly __brand: unique symbol };
-
-export function toQuadType(value: number): QuadType {
-  if ([1, 2, 3, 4].includes(value)) return value as unknown as QuadType;
-  throw new Error(`${value} is not QuadType`);
-}
 
 export function toIsoDateTime(value: string): IsoDateTime {
   const d = new Date(value);
