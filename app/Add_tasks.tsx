@@ -37,12 +37,12 @@ const Add_tasks = () => {
   const [isDone, setIsDone] = useState(false);
   const [isOnFocus, setIsOnFocus] = useState(false);
 
-  const [repeatType, setRepeatType] = useState<string>("");
+  const [repeatType, setRepeatType] = useState<RepeatType | null>(null);
   const [weekRepeat, setWeekRepeat] = useState<WeekDay[] | null>(null);
-  const [monthRepeat, setMonthRepeat] = useState<MonthDay[]>([]);
+  const [monthRepeat, setMonthRepeat] = useState<MonthDay[] | null>(null);
 
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
+  const [startTime, setStartTime] = useState<MinutesSinceMidnight | null>(null);
+  const [endTime, setEndTime] = useState<MinutesSinceMidnight | null>(null);
 
   // other stuff
   const inputRef = useRef<any>(null);
@@ -73,11 +73,11 @@ const Add_tasks = () => {
           setIsDone(task.isDone);
           setIsOnFocus(task.isOnFocus);
 
-          setRepeatType(task.repeatType?.toString() ?? "");
-          setWeekRepeat(task.weekRepeat ?? []);
-          setMonthRepeat(task.monthRepeat ?? []);
-          setStartTime(task.startTime?.toString() || "");
-          setEndTime(task.endTime?.toString() || "");
+          setRepeatType(task.repeatType);
+          setWeekRepeat(task.weekRepeat);
+          setMonthRepeat(task.monthRepeat);
+          setStartTime(task.startTime);
+          setEndTime(task.endTime);
         }
       }
     })();
@@ -130,7 +130,7 @@ const Add_tasks = () => {
     if (!weekDay) return; // safety if conversion can fail
 
     setWeekRepeat((prev = []) => {
-      if(!prev) throw new Error("week error");
+      if (!prev) throw new Error("week error");
       const alreadySelected = prev.includes(weekDay);
 
       if (alreadySelected) {
@@ -193,6 +193,12 @@ const Add_tasks = () => {
             >
               Weekly
             </Chip>
+            <Chip
+              selected={repeatType === "weekly"}
+              onPress={() => setRepeatType(toRepeatType("monthly"))}
+            >
+              Monthly
+            </Chip>
           </View>
           {repeatType === "weekly" && (
             <View style={styles.chipRow}>
@@ -210,12 +216,16 @@ const Add_tasks = () => {
           <TimePicker
             labelProp="Start Time"
             value={startTime?.toString() || ""}
-            onChange={setStartTime}
+            onChange={(time: string) => {
+              setStartTime(toMinutesSinceMidnight(Number(time)));
+            }}
           />
           <TimePicker
             labelProp="End Time"
             value={endTime?.toString() || ""}
-            onChange={setEndTime}
+            onChange={(time: string) => {
+              setEndTime(toMinutesSinceMidnight(Number(time)));
+            }}
           />
 
           <View style={styles.switchRow}>
