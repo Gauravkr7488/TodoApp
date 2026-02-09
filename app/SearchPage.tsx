@@ -22,23 +22,7 @@ export default function TaskPage() {
   };
   useEffect(() => {
     refreshTasks(includeFilters, excludeFilters);
-  }, [includeFilters]);
-
-  // const toggleFilter = (filter: string) => {
-  //   setIncludeFilters((previousFilters) => {
-  //     const isActive = previousFilters.includes(filter);
-
-  //     if (isActive) {
-  //       // remove filter
-  //       return previousFilters.filter(
-  //         (existingFilter) => existingFilter !== filter,
-  //       );
-  //     }
-
-  //     // add filter
-  //     return [...previousFilters, filter];
-  //   });
-  // };
+  }, [includeFilters, excludeFilters]);
 
   const toggleFilter = (filter: string) => {
     if (includeFilters.includes(filter)) {
@@ -71,7 +55,6 @@ export default function TaskPage() {
                   ? "close"
                   : undefined
             }
-            // selected={vState === "include" || vState === "exclude"}
             onPress={() => {
               toggleFilter(filter);
             }}
