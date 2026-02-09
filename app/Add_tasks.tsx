@@ -232,17 +232,20 @@ const Add_tasks = () => {
               setEndTime(toMinutesSinceMidnight(Number(time)));
             }}
           />
-
-          <View style={styles.switchRow}>
-            <Text>Is Archived</Text>
-            <Switch value={isArchived} onValueChange={setIsArcived} />
-          </View>
-          <View style={styles.switchRow}>
-            <Text>Active</Text>
-            <Switch value={isActive} onValueChange={setIsActive} />
-          </View>
         </>
       )}
+      <View style={styles.switchRow}>
+        <Text>Active</Text>
+        <Switch value={isActive} onValueChange={setIsActive} />
+      </View>
+      <View style={styles.switchRow}>
+        <Text>Is Archived</Text>
+        <Switch value={isArchived} onValueChange={setIsArcived} />
+      </View>
+      <View style={styles.switchRow}>
+        <Text>Is Focused</Text>
+        <Switch value={isOnFocus} onValueChange={setIsOnFocus} />
+      </View>
       {id && (
         <FAB
           icon="delete"
