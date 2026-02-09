@@ -4,35 +4,21 @@ import * as SQLite from "expo-sqlite";
 import { AppState, AppStateStatus } from "react-native";
 
 export class Db {
-  // private static async getDB() {
-  //   const db = await SQLite.openDatabaseAsync("app.db");
-  //   if (!db) throw new Error("DB not initialized");
-  //   return db;    const db: SQLite.SQLiteDatabase
-
-  //   // return await SQLite.opend("app.db");
-  // }
-  // private static async getDB() {
-  //   try {
-  //     const db = await SQLite.openDatabaseAsync("app.db");
-  //     return db;
-  //   } catch (e: unknown) {
-  //     console.error("Failed to open DB:", e);
-  //     throw new Error(e instanceof Error ? e.message : String(e));
-  //   }
-  // }
   public static attachAppStateListener() {
     AppState.addEventListener(
       "change",
       async (nextAppState: AppStateStatus) => {
         if (nextAppState === "active") {
-          // Reopen DB if app resumed
-          // await TaskDB.ensureDB();
           this.db = await SQLite.openDatabaseAsync("app.db");
         }
       },
     );
   }
-
+/**
+ * do not remove the singelton db it will cause the #1 null point error
+ * and attachAppStateListener() will stop the db form dying when the app
+ * is resumed form the background. 
+ */
   private static db: SQLite.SQLiteDatabase | null = null;
 
   private static async getDB() {
@@ -71,6 +57,10 @@ export class Db {
 
             startTime INTEGER,
             endTime INTEGER,
+            
+            tags TEXT,
+            parentIds TEXT,
+            childIds TEXT,
             
             createdAt TEXT NOT NULL
         );
