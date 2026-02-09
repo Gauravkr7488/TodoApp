@@ -63,7 +63,6 @@ const Add_tasks = () => {
           setName(task.name);
           setDescription(task.description ?? "");
 
-
           setIsActive(task.isActive);
           setIsArcived(task.isArchived);
           setIsDone(task.isDone);
@@ -159,7 +158,10 @@ const Add_tasks = () => {
         mode="outlined"
         value={description}
         onChangeText={setDescription}
-        style={styles.input}
+        style={[styles.input, { minHeight: 120 }]}
+        multiline
+        numberOfLines={5}
+        textAlignVertical="top"
       />
 
       <View style={styles.switchRow}>
