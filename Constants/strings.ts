@@ -5,7 +5,7 @@ export const STRINGS = {
   routine: "Routine",
   onfocus: "On Focus",
   all: "All",
-  current: "Current",
+  active: "Active",
 };
 
 export const WEEKDAY = {

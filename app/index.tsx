@@ -2,8 +2,8 @@ import { STRINGS } from "@/Constants/strings";
 import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -20,19 +20,21 @@ export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const homeFilter = [
-    STRINGS.current,
+    STRINGS.active,
     STRINGS.all,
     STRINGS.routine,
     STRINGS.onfocus,
   ];
-  const [activeTab, setActiveTab] = useState(STRINGS.current);
-  useEffect(() => {
-    const run = async () => {
-      await refreshTasks();
-    };
+  const [activeTab, setActiveTab] = useState(STRINGS.active);
 
-    run();
-  }, [activeTab]);
+  useFocusEffect(
+    useCallback(() => {
+      const run = async () => {
+        await refreshTasks();
+      };
+      run();
+    }, [activeTab]),
+  );
 
   const clearCompleted = async () => {
     await Db.archiveCompletedTasks();
@@ -61,7 +63,7 @@ export default function Index() {
     let rows: Task[] = [];
     await toggleRoutines();
 
-    if (activeTab == STRINGS.current) {
+    if (activeTab == STRINGS.active) {
       let rows = await Dal.getAllActiveTasks();
       rows = rows.filter((row) => row.isArchived !== true); // only not archived
       setTasks(rows);
