@@ -12,7 +12,7 @@ export default function TaskPage() {
   const [includeFilters, setIncludeFilters] = useState<string[]>([]);
   const [excludeFilters, setExcludeFilters] = useState<string[]>([]);
   const searchFilters = [STRINGS.archived, STRINGS.routine];
-  const [vState, setVstate] = useState("include");
+  // const [vState, setVstate] = useState("none");
   const refreshTasks = async (
     includeFilters: string[],
     excludeFilters: string[],
@@ -40,7 +40,7 @@ export default function TaskPage() {
   //   });
   // };
 
-  const onFilterPress = (filter: string) => {
+  const toggleFilter = (filter: string) => {
     if (includeFilters.includes(filter)) {
       // move include → exclude
       setIncludeFilters((prev) => prev.filter((f) => f !== filter));
@@ -57,18 +57,6 @@ export default function TaskPage() {
     // none → include
     setIncludeFilters((prev) => [...prev, filter]);
   };
-  const getState = (filter: string) => {
-    if (includeFilters.includes(filter)) {
-      setVstate("include");
-      return;
-    }
-    if (excludeFilters.includes(filter)) {
-      setVstate("exclude");
-      return;
-    }
-    setVstate("none");
-    return;
-  };
   return (
     <View style={styles.container}>
       <TextInput label="Search" mode="outlined" onChangeText={setText} />
@@ -76,16 +64,17 @@ export default function TaskPage() {
         {searchFilters.map((filter) => (
           <Chip
             key={filter}
-            selected={vState === "include"}
-            style={{
-              backgroundColor:
-                vState === "include"
-                  ? "green"
-                  : vState === "exclude"
-                    ? "red"
-                    : "gray",
+            icon={
+              includeFilters.includes(filter)
+                ? "check"
+                : excludeFilters.includes(filter)
+                  ? "close"
+                  : undefined
+            }
+            // selected={vState === "include" || vState === "exclude"}
+            onPress={() => {
+              toggleFilter(filter);
             }}
-            onPress={() => onFilterPress(filter)}
           >
             {filter}
           </Chip>
