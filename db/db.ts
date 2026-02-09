@@ -5,6 +5,7 @@ import * as SQLite from "expo-sqlite";
 export class Db {
   private static async getDB() {
     return await SQLite.openDatabaseAsync("app.db");
+    // return await SQLite.opend("app.db");
   }
 
   private static async initDB() {
@@ -101,7 +102,7 @@ export class Db {
           weekRepeat = ?,
           monthRepeat = ?,
           startTime = ?,
-          endTime = ?,
+          endTime = ?
         WHERE id = ?;
 
       `,
@@ -178,7 +179,7 @@ export class Db {
     );
   }
 
-  protected static async getRepeatTasksDB() {
+  protected static async getRepeatTypeRows() {
     const db = await this.getDB();
     return db.getAllAsync<TaskRow>(`
         SELECT * FROM TASKS
@@ -253,5 +254,38 @@ export class Db {
     return await db.getAllAsync<TaskRow>(`
         SELECT * FROM TASKS WHERE isOnFocus = 1
       `);
+  }
+
+  static async toggleTimedTasks(nowMinutes: number) {
+    const db = await this.getDB();
+    const unarchiveActiveTasks = await this.getUnarchivedTasks();
+    const activeTasks = unarchiveActiveTasks.filter(
+      (task) =>
+        task.startTime != null &&
+        task.endTime != null &&
+        task.startTime <= nowMinutes &&
+        task.endTime >= nowMinutes,
+    );
+
+    const notActiveTasks = unarchiveActiveTasks.filter(
+      (task) =>
+        (task.startTime != null && task.startTime > nowMinutes) ||
+        (task.endTime != null && task.endTime < nowMinutes),
+    );
+    await Promise.all(
+      activeTasks.map((task) => this.toggleActiveStatus(1, task.id)),
+    );
+    await Promise.all(
+      notActiveTasks.map((task) => this.toggleActiveStatus(0, task.id)),
+    );
+  }
+
+  static async toggleActiveStatus(isActive: number, id: number) {
+    const db = await this.getDB();
+    await db.runAsync(
+      `UPDATE TASKS SET isActive = ? WHERE id = ?`,
+      isActive,
+      id,
+    );
   }
 }

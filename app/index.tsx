@@ -1,6 +1,9 @@
-import { toggleTimedTasks, unarchiveRoutines } from "@/db/routines";
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { STRINGS } from "@/Constants/strings";
+import { Task } from "@/Constants/type";
+import { Dal } from "@/db/DAL";
+import { toggleRoutines } from "@/db/routines";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -11,16 +14,11 @@ import {
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../db/db";
-import { Task } from "@/Constants/type";
-import { Dal } from "@/db/DAL";
-import { STRINGS } from "@/Constants/strings";
 import Tabs from "./Components/tabs";
 
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [dbReady, setDbReady] = useState(false);
-  const [checked, setChecked] = useState(false);
   const homeFilter = [
     STRINGS.current,
     STRINGS.all,
@@ -30,8 +28,6 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState(STRINGS.current);
   useEffect(() => {
     const run = async () => {
-      // await unarchiveRoutines();
-      // await toggleTimedTasks();
       await refreshTasks();
     };
 
@@ -62,30 +58,11 @@ export default function Index() {
     );
   };
 
-  // Ensure DB is ready on focus
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     let isActive = true;
-  //     async function fetchTasks() {
-  //       setDbReady(true);
-
-  //       if (isActive) {
-  //         const rows = await Dal.getUnarchivedTasksList();
-  //         setTasks(sortDoneTasks(rows));
-  //       }
-  //     }
-
-  //     fetchTasks();
-
-  //     return () => {
-  //       isActive = false;
-  //     };
-  //   }, []),
-  // );
-
   const refreshTasks = async () => {
     // entry point of tasks
     let rows: Task[] = [];
+    await toggleRoutines();
+
     if (activeTab == STRINGS.current) {
       rows = await Dal.getAllActiveTasks();
       setTasks(rows);
@@ -101,7 +78,7 @@ export default function Index() {
       setTasks(rows);
     }
 
-    if (activeTab == STRINGS.onfocus){
+    if (activeTab == STRINGS.onfocus) {
       rows = await Dal.getFocusedTasks();
       setTasks(rows);
     }

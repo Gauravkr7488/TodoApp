@@ -11,7 +11,7 @@ import {
   toQuadType,
   toRepeatType,
   toWeekDay,
-  WeekDay
+  WeekDay,
 } from "@/Constants/type";
 import { Db } from "./db";
 import { arrayToCSV, stringToArray } from "./utils";
@@ -170,8 +170,8 @@ export class Dal extends Db {
     return mapTaskRowToTask(task[0]);
   }
 
-  static async getRepeatTasks() {
-    const tasks = await this.getRepeatTasksDB();
+  static async getRoutines() {
+    const tasks = await this.getRepeatTypeRows();
     return tasks.map(mapTaskRowToTask);
   }
 

@@ -1,11 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Db } from "./db";
 import { Task } from "@/Constants/type";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Dal } from "./DAL";
+import { Db } from "./db";
 
 const UNARCHIVE_KEY = "last_unarchive_date";
 
-export async function unarchiveRoutines() {
+async function unarchiveRoutinesForToday() {
   const today = new Date();
   const todayISO = today.toISOString().slice(0, 10);
 
@@ -34,24 +34,37 @@ export async function unarchiveRoutines() {
   await AsyncStorage.setItem(UNARCHIVE_KEY, todayISO);
 }
 
-export async function toggleTimedTasks() {
+export async function toggleRoutines() {
+  await unarchiveRoutinesForToday(); // goes in all and routines
+  
   const today = new Date();
-
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
+  await Db.toggleTimedTasks(nowMinutes);
 
-  const tasks = await Dal.getRepeatTasks();
+  // const tasks = await Dal.getRoutines();
 
-  for (const task of tasks) {
-    if (!task.startTime || !task.endTime) continue;
-
-    // const start = toMinutes(task.startTime);
-    // const end = toMinutes(task.end_time);
-
-    await unarchiveActiveTasks(nowMinutes, task.startTime, task.endTime, task, today);
-    await archiveNonActiveTasks(nowMinutes, task.endTime, task);
-  }
+  // if it is marked daily and its not done yet
+  // if its weekly and today is the day
+  // if its in the time range
+  // for (const task of tasks) {
+  //   if (!task.startTime || !task.endTime) continue;
+  //   await unarchiveActiveTasks(
+  //     nowMinutes,
+  //     task.startTime,
+  //     task.endTime,
+  //     task,
+  //     today,
+  //   );
+  //   await archiveNonActiveTasks(nowMinutes, task.endTime, task);
+  // }
 }
 
+// async function toggleTimedTasks() {
+//   const today = new Date();
+//   const nowMinutes = today.getHours() * 60 + today.getMinutes();
+
+//   await toggleUnarchivedTasks(nowMinutes)
+// }
 async function archiveNonActiveTasks(
   nowMinutes: number,
   end: number,
