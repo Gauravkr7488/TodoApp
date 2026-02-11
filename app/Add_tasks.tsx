@@ -3,21 +3,19 @@ import {
   MinutesSinceMidnight,
   MonthDay,
   RepeatType,
-  toMinutesSinceMidnight,
-  toMonthDay,
   toRepeatType,
   toWeekDay,
   WeekDay,
 } from "@/Constants/type";
-import { useRouter } from "expo-router";
-import { useSearchParams } from "expo-router/build/hooks";
-import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Switch, Text, View } from "react-native";
-import { Chip, FAB, TextInput } from "react-native-paper";
-import TimePicker from "./Components/dateTimePicker";
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
 import { formatMinutesToAMPM, toMinutes } from "@/db/utils";
+import { useRouter } from "expo-router";
+import { useSearchParams } from "expo-router/build/hooks";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, StyleSheet, Switch, Text, View } from "react-native";
+import { Chip, FAB, TextInput } from "react-native-paper";
+import TimePicker from "./Components/dateTimePicker";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -256,7 +254,21 @@ const Add_tasks = () => {
       <FAB
         icon="content-save"
         label="Save"
-        onPress={saveTask}
+        onPress={async () => {
+          const isDuplicate = await Db.isNameDuplicate(name);
+          if (isDuplicate) {
+            Alert.alert(
+              "Duplicate Name",
+              "This name already exists. Proceed anyway?",
+              [
+                { text: "Cancel", style: "cancel" },
+                { text: "Proceed", onPress: async () => await saveTask() },
+              ],
+            );
+            return;
+          }
+          await saveTask();
+        }}
         style={styles.fab}
       />
     </View>
