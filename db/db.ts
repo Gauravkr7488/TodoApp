@@ -14,11 +14,11 @@ export class Db {
       },
     );
   }
-/**
- * do not remove the singelton db it will cause the #1 null point error
- * and attachAppStateListener() will stop the db form dying when the app
- * is resumed form the background. 
- */
+  /**
+   * do not remove the singelton db it will cause the #1 null point error
+   * and attachAppStateListener() will stop the db form dying when the app
+   * is resumed form the background.
+   */
   private static db: SQLite.SQLiteDatabase | null = null;
 
   private static async getDB() {
@@ -305,5 +305,15 @@ export class Db {
       isActive,
       id,
     );
+  }
+
+  static async isNameDuplicate(name: string) {
+    const db = await this.getDB();
+    let result = await db.getAllAsync(
+      `SELECT 1 FROM TASKS WHERE name = ?`,
+      name,
+    );
+    if (result) return true;
+    return false;
   }
 }
