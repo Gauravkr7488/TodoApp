@@ -29,7 +29,8 @@ export function toMinutes(time12h: string) {
   return toMinutesSinceMidnight(time);
 }
 
-export function formatMinutesToAMPM(minutes: MinutesSinceMidnight) {
+export function formatMinutesToAMPM(n: number) {
+  const minutes = toMinutesSinceMidnight(n);
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   const period = h >= 12 ? "pm" : "am";
