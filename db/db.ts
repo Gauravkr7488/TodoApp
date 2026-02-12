@@ -313,7 +313,7 @@ export class Db {
       `SELECT 1 FROM TASKS WHERE name = ?`,
       name,
     );
-    if (result) return true;
+    if (result.length > 0) return true;
     return false;
   }
 }

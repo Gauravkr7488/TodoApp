@@ -21,7 +21,6 @@ function mapTaskRowToTask(row: TaskRow): Task {
     name: row.name,
     description: row.description,
 
-
     isDone: !!row.isDone,
     isArchived: !!row.isArchived,
     isActive: !!row.isActive,
@@ -44,7 +43,6 @@ function mapTaskTotaskRow(task: Task): TaskRow {
 
     name: task.name,
     description: task.description,
-
 
     isDone: task.isDone ? 1 : 0,
     isArchived: task.isArchived ? 1 : 0,
@@ -103,8 +101,8 @@ export class Dal extends Db {
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
-    startTime: MinutesSinceMidnight | null,
-    endTime: MinutesSinceMidnight | null,
+    startTime: number | null,
+    endTime: number | null,
     id: number,
   ) {
     const task = createTask(
@@ -133,8 +131,8 @@ export class Dal extends Db {
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
     monthRepeat: MonthDay[] | null,
-    startTime: MinutesSinceMidnight | null,
-    endTime: MinutesSinceMidnight | null,
+    startTime: number | null,
+    endTime: number | null,
   ) {
     const task = createTask(
       name,
@@ -182,7 +180,6 @@ function createTask(
   name: string,
   description: string | null,
 
-
   isDone: boolean,
   isArchived: boolean,
   isActive: boolean,
@@ -192,13 +189,17 @@ function createTask(
   weekRepeat: WeekDay[] | null,
   monthRepeat: MonthDay[] | null,
 
-  startTime: MinutesSinceMidnight | null,
-  endTime: MinutesSinceMidnight | null,
+  startTimeX: number | null,
+  endTimeX: number | null,
 
   id?: number,
 ): Task {
   const iso = new Date().toISOString();
   const createdAt = toIsoDateTime(iso);
+  let startTime = null;
+  let endTime = null;
+  if (startTimeX) startTime = toMinutesSinceMidnight(startTimeX);
+  if (endTimeX) endTime = toMinutesSinceMidnight(endTimeX);
   if (!id) id = 0;
   return {
     id,

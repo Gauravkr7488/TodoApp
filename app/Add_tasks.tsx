@@ -36,8 +36,8 @@ const Add_tasks = () => {
   const [weekRepeat, setWeekRepeat] = useState<WeekDay[] | null>(null);
   const [monthRepeat, setMonthRepeat] = useState<MonthDay[] | null>(null);
 
-  const [startTime, setStartTime] = useState<MinutesSinceMidnight | null>(null);
-  const [endTime, setEndTime] = useState<MinutesSinceMidnight | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
 
   // other stuff
   const inputRef = useRef<any>(null);
@@ -82,6 +82,15 @@ const Add_tasks = () => {
   const saveTask = async () => {
     if (!name.trim()) return alert("Name required");
     if (repeatType == "weekly" && !weekRepeat) return alert("choose a day");
+    let newStartTime = startTime;
+    let newEndTime = endTime;
+    if (startTime != null && endTime == null) {
+      newEndTime = 1438;
+    } else if (startTime == null && endTime != null) {
+      newStartTime = 1;
+    }
+    console.log(startTime, endTime);
+    console.log(newStartTime, newEndTime);
 
     if (id) {
       // UPDATE existing task
@@ -95,8 +104,8 @@ const Add_tasks = () => {
         repeatType,
         weekRepeat,
         monthRepeat,
-        startTime,
-        endTime,
+        newStartTime,
+        newEndTime,
         id,
       );
     } else {
@@ -111,8 +120,8 @@ const Add_tasks = () => {
         repeatType,
         weekRepeat,
         monthRepeat,
-        startTime,
-        endTime,
+        newStartTime,
+        newEndTime,
       );
     }
 
