@@ -9,7 +9,7 @@ import {
 } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
-import { formatMinutesToAMPM, toMinutes } from "@/db/utils";
+import { formatMinutesToAMPM, toDDMMYYYY, toMinutes } from "@/db/utils";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useRef, useState } from "react";
@@ -39,6 +39,7 @@ const Add_tasks = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
 
+  const [creationDate, setCreationDate] = useState<string>();
   // other stuff
   const inputRef = useRef<any>(null);
   const [isRoutine, setIsRoutine] = useState(false);
@@ -73,6 +74,7 @@ const Add_tasks = () => {
           setEndTime(task.endTime);
 
           setIsRoutine(!!task.repeatType);
+          setCreationDate(toDDMMYYYY(task.createdAt));
         }
         console.log(task);
       }
@@ -170,7 +172,26 @@ const Add_tasks = () => {
         numberOfLines={5}
         textAlignVertical="top"
       />
-
+      {id && (
+        <View
+          style={{
+            padding: 10,
+            margin: 10,
+            borderRadius: 10,
+            backgroundColor: "#f2f2f2",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "300",
+              color: "#333",
+            }}
+          >
+            Created at - {creationDate}
+          </Text>
+        </View>
+      )}
       <View style={styles.switchRow}>
         <Text>Is Routine</Text>
         <Switch
