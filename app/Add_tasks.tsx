@@ -76,7 +76,7 @@ const Add_tasks = () => {
           setIsRoutine(!!task.repeatType);
           setCreationDate(toDDMMYYYY(task.createdAt));
         }
-        console.log(task);
+        // console.log(task);
       }
     })();
   }, [id]);
@@ -91,17 +91,16 @@ const Add_tasks = () => {
     } else if (startTime == null && endTime != null) {
       newStartTime = 1;
     }
-    console.log(startTime, endTime);
-    console.log(newStartTime, newEndTime);
+    // console.log(isDone);
 
     if (id) {
       // UPDATE existing task
       await Dal.updateTaskData(
         name,
         description,
-        isActive,
-        isArchived,
         isDone,
+        isArchived,
+        isActive,
         isOnFocus,
         repeatType,
         weekRepeat,
@@ -115,9 +114,9 @@ const Add_tasks = () => {
       await Dal.insertTaskDal(
         name,
         description,
-        isActive,
-        isArchived,
         isDone,
+        isArchived,
+        isActive,
         isOnFocus,
         repeatType,
         weekRepeat,
