@@ -1,5 +1,4 @@
 import {
-  MinutesSinceMidnight,
   MonthDay,
   RepeatType,
   Task,
@@ -73,12 +72,12 @@ function toMonthRepeat(s: string): MonthDay[] | null {
 
 export class Dal extends Db {
   static async getAllTodayRoutines() {
-    const tasks = await this.getAllNonDoneTask();
+    const tasks = await this.getNonDoneTasks();
     return tasks.filter((task) => !!task.repeatType);
   }
 
-  static async getAllNonDoneTask() {
-    const tasks = await this.getAllNonDoneRows();
+  static async getNonDoneTasks() {
+    const tasks = await this.getNonDoneRows();
     return tasks.map(mapTaskRowToTask);
   }
 
@@ -121,7 +120,7 @@ export class Dal extends Db {
       id,
     );
     // console.log(task.isDone);
-    
+
     await this.updateTask(mapTaskTotaskRow(task));
   }
   static async insertTaskDal(

@@ -260,7 +260,7 @@ export class Db {
       `);
   }
 
-  protected static async getAllNonDoneRows() {
+  protected static async getNonDoneRows() {
     const db = await this.getDB();
     return await db.getAllAsync<TaskRow>(`
         SELECT * FROM TASKS WHERE isDone = 0
