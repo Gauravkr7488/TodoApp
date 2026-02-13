@@ -38,3 +38,13 @@ export function formatMinutesToAMPM(n: number) {
   const minStr = m.toString().padStart(2, "0");
   return `${hour12}:${minStr} ${period}`;
 }
+
+export function toDDMMYYYY(iso: string) {
+  const d = new Date(iso);
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
