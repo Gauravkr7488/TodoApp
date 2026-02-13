@@ -94,9 +94,9 @@ export class Dal extends Db {
   static async updateTaskData(
     name: string,
     description: string | null,
-    isActive: boolean,
-    isArchived: boolean,
     isDone: boolean,
+    isArchived: boolean,
+    isActive: boolean,
     isOnFocus: boolean,
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
@@ -105,12 +105,13 @@ export class Dal extends Db {
     endTime: number | null,
     id: number,
   ) {
+    // console.log(isDone)
     const task = createTask(
       name,
       description,
-      isActive,
-      isArchived,
       isDone,
+      isArchived,
+      isActive,
       isOnFocus,
       repeatType,
       weekRepeat,
@@ -119,14 +120,16 @@ export class Dal extends Db {
       endTime,
       id,
     );
+    // console.log(task.isDone);
+    
     await this.updateTask(mapTaskTotaskRow(task));
   }
   static async insertTaskDal(
     name: string,
     description: string | null,
-    isActive: boolean,
-    isArchived: boolean,
     isDone: boolean,
+    isArchived: boolean,
+    isActive: boolean,
     isOnFocus: boolean,
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
@@ -205,9 +208,9 @@ function createTask(
     id,
     name,
     description,
-    isActive,
-    isArchived,
     isDone,
+    isArchived,
+    isActive,
     isOnFocus,
     repeatType,
     weekRepeat,

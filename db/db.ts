@@ -138,7 +138,7 @@ export class Db {
       task.endTime,
       task.id,
     );
-    console.log(task);
+    // console.log(task.isDone);
   }
 
   static async archiveCompletedTasks() {
