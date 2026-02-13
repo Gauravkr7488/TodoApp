@@ -70,7 +70,7 @@ export default function Index() {
     }
 
     if (activeTab == STRINGS.all) {
-      rows = await Dal.getNonDoneTasks();
+      rows = await Dal.getUnarchivedTasks();
       rows = rows.filter((row) => row.isArchived !== true);
       setTasks(rows);
     }

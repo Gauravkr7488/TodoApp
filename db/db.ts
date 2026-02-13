@@ -164,7 +164,7 @@ export class Db {
     await this.initDB();
   }
 
-  protected static async getUnarchivedTasks() {
+  protected static async getUnarchivedRows() {
     const database = await this.getDB();
     return database.getAllAsync<TaskRow>(
       `SELECT *
@@ -276,7 +276,7 @@ export class Db {
 
   static async toggleTimedTasks(nowMinutes: number) {
     const db = await this.getDB();
-    const unarchiveActiveTasks = await this.getUnarchivedTasks();
+    const unarchiveActiveTasks = await this.getUnarchivedRows();
     const activeTasks = unarchiveActiveTasks.filter(
       (task) =>
         task.startTime != null &&
