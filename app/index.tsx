@@ -118,6 +118,7 @@ export default function Index() {
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Checkbox
