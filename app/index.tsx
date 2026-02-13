@@ -66,25 +66,29 @@ export default function Index() {
     if (activeTab == STRINGS.active) {
       let rows = await Dal.getAllActiveTasks();
       rows = rows.filter((row) => row.isArchived !== true); // only not archived
-      setTasks(rows);
+      const sorted = sortDoneTasks(rows);
+      setTasks(sorted);
     }
 
     if (activeTab == STRINGS.all) {
-      rows = await Dal.getAllNonDoneTask();
+      rows = await Dal.getUnarchivedTasks();
       rows = rows.filter((row) => row.isArchived !== true);
-      setTasks(rows);
+      const sorted = sortDoneTasks(rows);
+      setTasks(sorted);
     }
 
     if (activeTab == STRINGS.routine) {
       rows = await Dal.getAllTodayRoutines();
       rows = rows.filter((row) => row.isArchived !== true);
-      setTasks(rows);
+      const sorted = sortDoneTasks(rows);
+      setTasks(sorted);
     }
 
     if (activeTab == STRINGS.onfocus) {
       rows = await Dal.getFocusedTasks();
       rows = rows.filter((row) => row.isArchived !== true);
-      setTasks(rows);
+      const sorted = sortDoneTasks(rows);
+      setTasks(sorted);
     }
   };
 
