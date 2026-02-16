@@ -10,12 +10,13 @@ import {
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
 import { formatMinutesToAMPM, toDDMMYYYY, toMinutes } from "@/db/utils";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
 import TimePicker from "./Components/dateTimePicker";
+import HeaderMenu from "./Components/menu";
 
 const Add_tasks = () => {
   const router = useRouter();
@@ -43,6 +44,7 @@ const Add_tasks = () => {
   // other stuff
   const inputRef = useRef<any>(null);
   const [isRoutine, setIsRoutine] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -149,6 +151,23 @@ const Add_tasks = () => {
     Db.deleteTask(id);
     router.back();
   };
+  
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () =>
+        id ? (
+          <HeaderMenu
+            items={[
+              {
+                title: "Delete",
+                icon: "delete",
+                onPress: handleDeleteTask,
+              },
+            ]}
+          />
+        ) : null,
+    });
+  }, [navigation, id]);
 
   return (
     <View style={styles.container}>
@@ -271,14 +290,6 @@ const Add_tasks = () => {
         <Text>Is Focused</Text>
         <Switch value={isOnFocus} onValueChange={setIsOnFocus} />
       </View>
-      {id && (
-        <FAB
-          icon="delete"
-          onPress={handleDeleteTask}
-          style={[styles.fab, { bottom: 80, backgroundColor: "#ef4444" }]}
-        />
-      )}
-
       <FAB
         icon="content-save"
         label="Save"
