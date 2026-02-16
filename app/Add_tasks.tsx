@@ -43,14 +43,6 @@ const Add_tasks = () => {
   // other stuff
   const inputRef = useRef<any>(null);
   const [isRoutine, setIsRoutine] = useState(false);
-  // useEffects
-  useEffect(() => {
-    const t = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 300); // will not work without the timeout
-
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -77,6 +69,13 @@ const Add_tasks = () => {
           setCreationDate(toDDMMYYYY(task.createdAt));
         }
         // console.log(task);
+      } else {
+        // autofocus logic
+        const t = setTimeout(() => {
+          inputRef.current?.focus();
+        }, 300); // will not work without the timeout
+
+        return () => clearTimeout(t);
       }
     })();
   }, [id]);
