@@ -4,10 +4,9 @@ export type Task = {
   name: string;
   description: string | null;
 
-
   isDone: boolean;
   isArchived: boolean; // for the routines that are not being used
-  isActive: boolean;  // for tasks that is currently needed to be done
+  isActive: boolean; // for tasks that is currently needed to be done
   isOnFocus: boolean; // for long term tasks that are our main focus
 
   repeatType: RepeatType | null;
@@ -25,7 +24,6 @@ export type TaskRow = {
 
   name: string;
   description: string | null;
-
 
   isDone: number;
   isArchived: number;
@@ -100,3 +98,13 @@ export function toMinutesSinceMidnight(value: number): MinutesSinceMidnight {
   }
   return value as MinutesSinceMidnight;
 }
+
+type MenuItem = {
+  title: string;
+  icon?: string;
+  onPress?: () => void;
+};
+
+export type HeaderMenuProps = {
+  items: MenuItem[];
+};
