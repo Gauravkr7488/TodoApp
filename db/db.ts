@@ -32,7 +32,7 @@ export class Db {
     }
   }
 
-  private static async initDB() {
+  public static async initDB() {
     const db = await this.getDB();
     await db.execAsync(
       `

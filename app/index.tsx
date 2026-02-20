@@ -3,7 +3,7 @@ import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -26,6 +26,13 @@ export default function Index() {
     STRINGS.onfocus,
   ];
   const [activeTab, setActiveTab] = useState(STRINGS.active);
+
+  useEffect(() => {  // creating db for new install
+    const init = async () => {
+      await Db.initDB();
+    };
+    init();
+  }, []); 
 
   useFocusEffect(
     useCallback(() => {
