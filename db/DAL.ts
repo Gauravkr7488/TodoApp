@@ -128,7 +128,7 @@ export class Dal extends Db {
     description: string | null,
     isDone: boolean,
     isArchived: boolean,
-    isActive: boolean,
+    isActive: boolean,  // todo remove later
     isOnFocus: boolean,
     repeatType: RepeatType | null,
     weekRepeat: WeekDay[] | null,
@@ -136,12 +136,14 @@ export class Dal extends Db {
     startTime: number | null,
     endTime: number | null,
   ) {
+    let activeStatus = isActive;
+    if(!repeatType) activeStatus = true
     const task = createTask(
       name,
       description,
       isDone,
       isArchived,
-      isActive,
+      activeStatus,
       isOnFocus,
       repeatType,
       weekRepeat,
