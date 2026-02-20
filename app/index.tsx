@@ -138,6 +138,12 @@ export default function Index() {
             />
             <Pressable
               onPress={() => {
+                router.push({
+                  pathname: "/detailViewScreen",
+                  params: { id: item.id },
+                })
+              }}
+              onLongPress={() => {
                 if (!item.isDone) {
                   router.push({
                     pathname: "/Add_tasks",
