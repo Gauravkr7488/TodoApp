@@ -169,13 +169,12 @@ const Add_tasks = () => {
     });
   }, [navigation, id]);
 
-  function isEndTimeEarlierThanStartTime(inMin: MinutesSinceMidnight | null
-) {
+  function isEndTimeEarlierThanStartTime(inMin: MinutesSinceMidnight | null) {
     if (!startTime || !inMin) return;
     if (startTime > inMin) {
       return true;
     }
-    return false
+    return false;
   }
 
   return (
@@ -283,8 +282,10 @@ const Add_tasks = () => {
                 return;
               }
               if (isEndTimeEarlierThanStartTime(inMin)) {
-                alert("End time must be later than the start time and cannot be in next day");
-                return
+                alert(
+                  "End time must be later than the start time and cannot be in next day",
+                );
+                return;
               }
               setEndTime(inMin);
             }}
@@ -307,7 +308,10 @@ const Add_tasks = () => {
         icon="content-save"
         label="Save"
         onPress={async () => {
-          const isDuplicate = await Db.isNameDuplicate(name);
+          let isDuplicate;
+          if (!id) {
+            isDuplicate = await Db.isNameDuplicate(name);
+          }
           if (isDuplicate) {
             Alert.alert(
               "Duplicate Name",
