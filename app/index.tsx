@@ -45,7 +45,7 @@ export default function Index() {
         await refreshTasks();
       };
       run();
-    }, [activeTab]),
+    }, [currentTab]),
   );
 
   const clearCompleted = async () => {
@@ -75,14 +75,14 @@ export default function Index() {
     let rows: Task[] = [];
     await toggleRoutines();
 
-    if (activeTab == STRINGS.active) {
+    if (currentTab == "Home") {
       let rows = await Dal.getAllActiveTasks();
       rows = rows.filter((row) => row.isArchived !== true); // only not archived
       const sorted = sortDoneTasks(rows);
       setTasks(sorted);
     }
 
-    if (activeTab == STRINGS.all) {
+    if (currentTab == "AllTasks") {
       rows = await Dal.getUnarchivedTasks();
       rows = rows.filter((row) => row.isArchived !== true);
       const sorted = sortDoneTasks(rows);
