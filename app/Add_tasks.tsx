@@ -151,7 +151,7 @@ const Add_tasks = () => {
     Db.deleteTask(id);
     router.back();
   };
-  
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () =>
@@ -168,6 +168,15 @@ const Add_tasks = () => {
         ) : null,
     });
   }, [navigation, id]);
+
+  function isEndTimeEarlierThanStartTime(inMin: MinutesSinceMidnight | null
+) {
+    if (!startTime || !inMin) return;
+    if (startTime > inMin) {
+      return true;
+    }
+    return false
+  }
 
   return (
     <View style={styles.container}>
@@ -272,6 +281,10 @@ const Add_tasks = () => {
               if (inMin == 0) {
                 alert("12:00 AM cannot be selected.");
                 return;
+              }
+              if (isEndTimeEarlierThanStartTime(inMin)) {
+                alert("End time must be later than the start time and cannot be in next day");
+                return
               }
               setEndTime(inMin);
             }}
