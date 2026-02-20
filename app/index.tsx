@@ -16,6 +16,7 @@ import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../db/db";
 import Tabs from "./Components/tabs";
 import CrispCheckbox from "./Components/check";
+import BottomNav from "./Components/bottomNav";
 
 export default function Index() {
   const router = useRouter();
@@ -27,7 +28,9 @@ export default function Index() {
     STRINGS.onfocus,
   ];
   const [activeTab, setActiveTab] = useState(STRINGS.active);
-
+  const [currentTab, setCurrentTab] = useState<
+    "Home" | "AllTasks" | "Settings"
+  >("Home");
   useEffect(() => {
     // creating db for new install
     const init = async () => {
@@ -42,7 +45,7 @@ export default function Index() {
         await refreshTasks();
       };
       run();
-    }, [activeTab]),
+    }, [currentTab]),
   );
 
   const clearCompleted = async () => {
@@ -72,14 +75,14 @@ export default function Index() {
     let rows: Task[] = [];
     await toggleRoutines();
 
-    if (activeTab == STRINGS.active) {
+    if (currentTab == "Home") {
       let rows = await Dal.getAllActiveTasks();
       rows = rows.filter((row) => row.isArchived !== true); // only not archived
       const sorted = sortDoneTasks(rows);
       setTasks(sorted);
     }
 
-    if (activeTab == STRINGS.all) {
+    if (currentTab == "AllTasks") {
       rows = await Dal.getUnarchivedTasks();
       rows = rows.filter((row) => row.isArchived !== true);
       const sorted = sortDoneTasks(rows);
@@ -120,79 +123,95 @@ export default function Index() {
   };
 
   return (
-    <View style={styles.container}>
-      <Tabs
-        tabs={homeFilter}
-        activeTab={activeTab}
-        onChange={async (value) => {
-          setActiveTab(value);
+    <View
+      style={{
+        flex: 1,
+        padding: 16,
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          // padding: 16,
+          // paddingBottom: 60
         }}
-      />
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => item.id.toString()}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              width: "100%",
-              padding: 5,
-              justifyContent: "space-between",
-              borderBottomWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
-            <Pressable
-              onPress={() => {
-                router.push({
-                  pathname: "/detailViewScreen",
-                  params: { id: item.id },
-                });
-              }}
-              onLongPress={() => {
-                if (!item.isDone) {
-                  router.push({
-                    pathname: "/Add_tasks",
-                    params: { id: item.id },
-                  });
-                }
+      >
+        {/* <Tabs
+          tabs={homeFilter}
+          activeTab={activeTab}
+          onChange={async (value) => {
+            setActiveTab(value);
+          }}
+        /> */}
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+                padding: 5,
+                justifyContent: "space-between",
+                borderBottomWidth: 1,
+                borderColor: "#ddd",
               }}
             >
-              <Text style={[styles.item, item.isDone && styles.done]}>
-                {item.name}
-              </Text>
-            </Pressable>
-            <Checkbox
-              status={item.isDone ? "checked" : "unchecked"}
-              onPress={() => handleCheckToggle(item)}
-            />
-            {/* <CrispCheckbox
+              <Pressable
+                onPress={() => {
+                  router.push({
+                    pathname: "/detailViewScreen",
+                    params: { id: item.id },
+                  });
+                }}
+                onLongPress={() => {
+                  if (!item.isDone) {
+                    router.push({
+                      pathname: "/Add_tasks",
+                      params: { id: item.id },
+                    });
+                  }
+                }}
+              >
+                <Text style={[styles.item, item.isDone && styles.done]}>
+                  {item.name}
+                </Text>
+              </Pressable>
+              <Checkbox
+                status={item.isDone ? "checked" : "unchecked"}
+                onPress={() => handleCheckToggle(item)}
+              />
+              {/* <CrispCheckbox
               checked={item.isDone}
               onPress={() => handleCheckToggle(item)}
             /> */}
-          </View>
-        )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No tasks yet. Add one!</Text>
-        }
-      />
-      <FAB
-        icon="delete"
-        label="Clear"
-        onPress={async () => await clearCompleted()}
-        onLongPress={handleReset}
-        style={[styles.fab, { bottom: 80 }]}
-        // disabled={!dbReady}
-      />
-
-      <FAB
-        icon="plus"
-        label="Add"
-        onPress={() => router.push("./Add_tasks")}
-        style={styles.fab}
-        // disabled={!dbReady} // prevent pressing before DB ready
+            </View>
+          )}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No tasks yet. Add one!</Text>
+          }
+        />
+        <FAB
+          icon="delete"
+          label="Clear"
+          onPress={async () => await clearCompleted()}
+          onLongPress={handleReset}
+          style={[styles.fab, { bottom: 80 }]}
+          // disabled={!dbReady}
+        />
+        <FAB
+          icon="plus"
+          label="Add"
+          onPress={() => router.push("./Add_tasks")}
+          style={styles.fab}
+          // disabled={!dbReady} // prevent pressing before DB ready
+        />
+      </View>
+      <BottomNav
+        activeTab={currentTab}
+        onChange={(tab) => setCurrentTab(tab)}
       />
     </View>
   );
@@ -218,7 +237,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     bottom: 16,
-    backgroundColor: "#22c55e",
+    backgroundColor: "#7ec598ff",
   },
   row: {
     flexDirection: "row",
