@@ -15,6 +15,7 @@ import {
 import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../db/db";
 import Tabs from "./Components/tabs";
+import CrispCheckbox from "./Components/check";
 
 export default function Index() {
   const router = useRouter();
@@ -27,12 +28,13 @@ export default function Index() {
   ];
   const [activeTab, setActiveTab] = useState(STRINGS.active);
 
-  useEffect(() => {  // creating db for new install
+  useEffect(() => {
+    // creating db for new install
     const init = async () => {
       await Db.initDB();
     };
     init();
-  }, []); 
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -131,17 +133,23 @@ export default function Index() {
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Checkbox
-              status={item.isDone ? "checked" : "unchecked"}
-              onPress={() => handleCheckToggle(item)}
-            />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              width: "100%",
+              padding: 5,
+              justifyContent: "space-between",
+              borderBottomWidth: 1,
+              borderColor: "#ddd",
+            }}
+          >
             <Pressable
               onPress={() => {
                 router.push({
                   pathname: "/detailViewScreen",
                   params: { id: item.id },
-                })
+                });
               }}
               onLongPress={() => {
                 if (!item.isDone) {
@@ -156,6 +164,14 @@ export default function Index() {
                 {item.name}
               </Text>
             </Pressable>
+            <Checkbox
+              status={item.isDone ? "checked" : "unchecked"}
+              onPress={() => handleCheckToggle(item)}
+            />
+            {/* <CrispCheckbox
+              checked={item.isDone}
+              onPress={() => handleCheckToggle(item)}
+            /> */}
           </View>
         )}
         ListEmptyComponent={
@@ -190,8 +206,8 @@ const styles = StyleSheet.create({
   item: {
     padding: 16,
     fontSize: 16,
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
+    // borderBottomWidth: 1,
+    // borderColor: "#ddd",
   },
   empty: {
     padding: 16,
