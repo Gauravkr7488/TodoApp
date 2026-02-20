@@ -36,6 +36,7 @@
           pkgs.gradle
           androidSdk.androidsdk
           pkgs.nodejs_20
+          pkgs.google-chrome
         ];
 
         ANDROID_HOME = "${androidSdk.androidsdk}/libexec/android-sdk";
@@ -43,6 +44,7 @@
 
         shellHook = ''
           export PATH=$ANDROID_HOME/platform-tools:$PATH
+          export REACT_DEBUGGER="google-chrome"
           echo " DevEnv ready"
           zsh
         '';
