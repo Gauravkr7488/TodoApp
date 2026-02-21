@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../../db/db";
+import ClearButton from "@/Components/clearButton";
+import AddButton from "@/Components/addButton";
 
 export default function Index() {
   const router = useRouter();
@@ -144,20 +146,11 @@ export default function Index() {
             <Text style={styles.empty}>No tasks yet. Add one!</Text>
           }
         />
-        <FAB
-          icon="delete"
-          label="Clear"
+        <ClearButton
           onPress={async () => await clearCompleted()}
           onLongPress={handleReset}
-          style={[styles.fab, { bottom: 80 }]}
-          // disabled={!dbReady}
         />
-        <FAB
-          icon="plus"
-          label="Add"
-          onPress={() => router.push("/Screens/Add_tasks")}
-          style={styles.fab}
-        />
+        <AddButton onPress={() => router.push("/Screens/Add_tasks")} />
       </View>
     </View>
   );
