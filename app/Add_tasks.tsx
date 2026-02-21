@@ -1,11 +1,11 @@
 import { WEEKDAY } from "@/Constants/strings";
 import {
-  MinutesSinceMidnight,
-  MonthDay,
-  RepeatType,
-  toRepeatType,
-  toWeekDay,
-  WeekDay,
+    MinutesSinceMidnight,
+    MonthDay,
+    RepeatType,
+    toRepeatType,
+    toWeekDay,
+    WeekDay,
 } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
@@ -15,8 +15,8 @@ import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import TimePicker from "./Components/dateTimePicker";
-import HeaderMenu from "./Components/menu";
+import TimePicker from "../Components/dateTimePicker";
+import HeaderMenu from "../Components/menu";
 
 const Add_tasks = () => {
   const router = useRouter();

@@ -13,10 +13,8 @@ import {
   View,
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
+import BottomNav from "../Components/bottomNav";
 import { Db } from "../db/db";
-import Tabs from "./Components/tabs";
-import CrispCheckbox from "./Components/check";
-import BottomNav from "./Components/bottomNav";
 
 export default function Index() {
   const router = useRouter();
