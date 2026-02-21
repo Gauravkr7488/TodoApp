@@ -225,12 +225,13 @@ const Add_tasks = () => {
         </CustomView>
       )}
       <CustomView style={styles.switchRow}>
-        <CustomText>Is Routine</CustomText>
+        <CustomText>Repeate</CustomText>
         <Switch
           value={isRoutine}
           onValueChange={(value) => {
             setIsRoutine(value);
-            setRepeatType(value ? toRepeatType("daily") : null);
+            // setRepeatType(value ? toRepeatType("daily") : null);
+            setRepeatType(toRepeatType("daily"));
           }}
         />
       </CustomView>
@@ -299,18 +300,18 @@ const Add_tasks = () => {
           />
         </>
       )}
-      <CustomView style={styles.switchRow}>
+      {/* <CustomView style={styles.switchRow}>
         <CustomText>Active</CustomText>
         <Switch value={isActive} onValueChange={setIsActive} />
-      </CustomView>
-      <CustomView style={styles.switchRow}>
+      </CustomView> */}
+      {/* <CustomView style={styles.switchRow}>
         <CustomText>Is Archived</CustomText>
         <Switch value={isArchived} onValueChange={setIsArcived} />
       </CustomView>
       <CustomView style={styles.switchRow}>
         <CustomText>Is Focused</CustomText>
         <Switch value={isOnFocus} onValueChange={setIsOnFocus} />
-      </CustomView>
+      </CustomView> */}
       <FAB
         icon={() => <Ionicons name="save" size={24} />}
         onPress={async () => {
