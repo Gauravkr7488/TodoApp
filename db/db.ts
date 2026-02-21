@@ -9,7 +9,7 @@ export class Db {
       "change",
       async (nextAppState: AppStateStatus) => {
         if (nextAppState === "active") {
-          this.db = await SQLite.openDatabaseAsync("app.db");
+          this.db = await this.openDb();
         }
       },
     );
@@ -21,6 +21,12 @@ export class Db {
    */
   private static db: SQLite.SQLiteDatabase | null = null;
 
+  private static async openDb() {
+    await this.db?.closeAsync();
+    const db = await SQLite.openDatabaseAsync("app.db");
+    return db;
+  }
+
   private static async getHealthyDb() {
     let result;
     try {
@@ -30,8 +36,6 @@ export class Db {
     } catch (e: unknown) {
       console.error("Issue with Db:", e);
     }
-    await this.db?.closeAsync();
-    this.db = null;
     return;
   }
 
@@ -42,11 +46,10 @@ export class Db {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       let db = await this.getHealthyDb();
       if (db) return db;
-      this.db = await SQLite.openDatabaseAsync("app.db");
+      this.db = await this.openDb();
       // wait before next attempt
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
-    await this.db?.closeAsync();
     this.db = null;
     throw new Error("Unable to get a healthy DB after multiple attempts");
   }
