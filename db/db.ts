@@ -21,15 +21,34 @@ export class Db {
    */
   private static db: SQLite.SQLiteDatabase | null = null;
 
-  private static async getDB() {
-    if (this.db) return this.db;
+  private static async getHealthyDb() {
+    let result;
     try {
-      this.db = await SQLite.openDatabaseAsync("app.db");
-      return this.db;
+      if (!this.db) return;
+      result = await this.db.getAllAsync("SELECT 1;");
+      if (result) return this.db;
     } catch (e: unknown) {
-      console.error("Failed to open DB:", e);
-      throw new Error(e instanceof Error ? e.message : String(e));
+      console.error("Issue with Db:", e);
     }
+    await this.db?.closeAsync();
+    this.db = null;
+    return;
+  }
+
+  private static async getDB(): Promise<SQLite.SQLiteDatabase> {
+    const retryDelay = 100; // ms
+    const maxRetries = 15;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      let db = await this.getHealthyDb();
+      if (db) return db;
+      this.db = await SQLite.openDatabaseAsync("app.db");
+      // wait before next attempt
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+    }
+    await this.db?.closeAsync();
+    this.db = null;
+    throw new Error("Unable to get a healthy DB after multiple attempts");
   }
 
   public static async initDB() {
@@ -165,12 +184,17 @@ export class Db {
   }
 
   protected static async getUnarchivedRows() {
-    const database = await this.getDB();
-    return await database.getAllAsync<TaskRow>(
-      `SELECT *
-     FROM TASKS
-     WHERE isArchived = 0`,
-    );
+    const db = await this.getDB();
+
+    try {
+      return await db.getAllAsync<TaskRow>(
+        `SELECT *
+       FROM TASKS
+       WHERE isArchived = 0`,
+      );
+    } catch (error: unknown) {
+      console.log(error);
+    }
   }
 
   protected static async getTask(id: number) {
@@ -275,8 +299,9 @@ export class Db {
   }
 
   static async toggleTimedTasks(nowMinutes: number) {
-    const db = await this.getDB();
+    // const db = await this.getDB();
     const unarchiveActiveTasks = await this.getUnarchivedRows();
+    if (!unarchiveActiveTasks) return;
     const activeTasks = unarchiveActiveTasks.filter(
       (task) =>
         task.startTime != null &&
