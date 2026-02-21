@@ -206,7 +206,7 @@ const Add_tasks = () => {
         numberOfLines={5}
         textAlignVertical="top"
       />
-      {id && (
+      {/* {id && (
         <CustomView
           style={{
             padding: 10,
@@ -223,7 +223,7 @@ const Add_tasks = () => {
             Created at - {creationDate}
           </CustomText>
         </CustomView>
-      )}
+      )} */}
       <CustomView style={styles.switchRow}>
         <CustomText>Repeate</CustomText>
         <Switch

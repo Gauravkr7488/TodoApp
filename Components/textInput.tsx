@@ -12,6 +12,7 @@ export default function CustomTextInput({ style, ...rest }: Props) {
     <TextInput
       {...rest}
       placeholderTextColor={theme.textSecondary}
+      textColor={theme.textPrimary}
       style={[
         {
           backgroundColor: theme.surface,

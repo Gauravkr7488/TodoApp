@@ -112,14 +112,14 @@ export default function Index() {
                 borderColor: theme.border,
               }}
             >
-              {/* <Pressable
+              <Pressable
                 style={{ flex: 1 }}
-                onPress={() => {
-                  router.push({
-                    pathname: "/Screens/detailViewScreen",
-                    params: { id: item.id },
-                  });
-                }}
+                // onPress={() => {
+                //   router.push({
+                //     pathname: "/Screens/detailViewScreen",
+                //     params: { id: item.id },
+                //   });
+                // }}
                 onLongPress={() => {
                   if (!item.isDone) {
                     router.push({
@@ -128,11 +128,11 @@ export default function Index() {
                     });
                   }
                 }}
-              > */}
+              >
               <CustomText style={[styles.item, item.isDone && styles.done]}>
                 {item.name}
               </CustomText>
-              {/* </Pressable> */}
+              </Pressable>
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
