@@ -20,7 +20,7 @@ export default function BottomNav({ activeTab, onChange }: BottomNavProps) {
         borderTopWidth: 1,
         borderTopColor: "#ddd",
         paddingVertical: 10,
-        paddingBottom:50
+        paddingBottom:30
         // backgroundColor: "#fff",
       }}
     >
@@ -30,7 +30,9 @@ export default function BottomNav({ activeTab, onChange }: BottomNavProps) {
           <Pressable
             key={tab.key}
             onPress={() => onChange(tab.key)}
-            style={{ alignItems: "center" }}
+            style={{ alignItems: "center",
+              padding: 20
+             }}
           >
             <Text
               style={{
