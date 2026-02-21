@@ -166,7 +166,7 @@ export class Db {
 
   protected static async getUnarchivedRows() {
     const database = await this.getDB();
-    return database.getAllAsync<TaskRow>(
+    return await database.getAllAsync<TaskRow>(
       `SELECT *
      FROM TASKS
      WHERE isArchived = 0`,
@@ -200,7 +200,7 @@ export class Db {
 
   protected static async getRepeatTypeRows() {
     const db = await this.getDB();
-    return db.getAllAsync<TaskRow>(`
+    return await db.getAllAsync<TaskRow>(`
         SELECT * FROM TASKS
         WHERE repeatType IS NOT NULL
       `);
