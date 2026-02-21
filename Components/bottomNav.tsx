@@ -15,12 +15,17 @@ export default function BottomNav({ activeTab, onChange }: BottomNavProps) {
   return (
     <View
       style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        
         flexDirection: "row",
         justifyContent: "space-around",
         borderTopWidth: 1,
         borderTopColor: "#ddd",
         paddingVertical: 10,
-        paddingBottom:30
+        paddingBottom: 30,
         // backgroundColor: "#fff",
       }}
     >
@@ -30,9 +35,7 @@ export default function BottomNav({ activeTab, onChange }: BottomNavProps) {
           <Pressable
             key={tab.key}
             onPress={() => onChange(tab.key)}
-            style={{ alignItems: "center",
-              padding: 20
-             }}
+            style={{ alignItems: "center", padding: 20 }}
           >
             <Text
               style={{
