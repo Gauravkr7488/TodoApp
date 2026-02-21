@@ -4,11 +4,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider, useTheme } from "../Components/ThemeContext";
 
 const AppWithTheme = () => {
-  const { isDark } = useTheme();
-  const theme = isDark ? MD3DarkTheme : MD3LightTheme;
-
   return (
-    <PaperProvider theme={theme}>
+    <PaperProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
