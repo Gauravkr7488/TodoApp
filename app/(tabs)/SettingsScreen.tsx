@@ -1,13 +1,15 @@
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { StyleSheet, Switch, View } from "react-native";
 import { useTheme } from "../../Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
+import AppText from "../../Components/text";
 
 const SettingsScreen = () => {
   const { isDark, toggleDark } = useTheme();
-
+  const theme = isDark ? darkThemeColors : lightThemeColors;
   return (
-    <View style={{ flex: 1, padding: 16 }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: theme.background }}>
       <View style={styles.row}>
-        <Text style={styles.label}>Dark Mode</Text>
+        <AppText style={styles.label}>Dark Mode</AppText>
         <Switch value={isDark} onValueChange={toggleDark} />
       </View>
     </View>
