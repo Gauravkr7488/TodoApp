@@ -4,7 +4,11 @@ import { Dal } from "@/db/DAL";
 import { toDDMMYYYY, formatMinutesToAMPM } from "@/db/utils";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
+import CustomView from "@/Components/view";
+import CustomText from "../../Components/text";
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 
 const TaskDetailScreen = () => {
   const params = useSearchParams();
@@ -28,6 +32,8 @@ const TaskDetailScreen = () => {
   const [creationDate, setCreationDate] = useState<string>();
   const [isRoutine, setIsRoutine] = useState(false);
 
+  const { isDark } = useTheme();
+  const theme = isDark ? darkThemeColors : lightThemeColors;
   useEffect(() => {
     (async () => {
       if (id) {
@@ -55,88 +61,92 @@ const TaskDetailScreen = () => {
   }, [id]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{name}</Text>
-      </View>
+    <CustomView style={{ flex: 1, padding: 16, borderTopColor: theme.border, borderWidth: 2 }}>
+      <CustomView style={styles.section}>
+        <CustomText style={styles.label}>Name:</CustomText>
+        <CustomText style={styles.value}>{name}</CustomText>
+      </CustomView>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Description:</Text>
-        <Text style={styles.value}>{description || "—"}</Text>
-      </View>
+      <CustomView style={styles.section}>
+        <CustomText style={styles.label}>Description:</CustomText>
+        <CustomText style={styles.value}>{description || "—"}</CustomText>
+      </CustomView>
 
       {creationDate && (
-        <View style={styles.section}>
-          <Text style={styles.label}>Created At:</Text>
-          <Text style={styles.value}>{creationDate}</Text>
-        </View>
+        <CustomView style={styles.section}>
+          <CustomText style={styles.label}>Created At:</CustomText>
+          <CustomText style={styles.value}>{creationDate}</CustomText>
+        </CustomView>
       )}
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Routine:</Text>
-        <Text style={styles.value}>{isRoutine ? "Yes" : "No"}</Text>
-      </View>
+      <CustomView style={styles.section}>
+        <CustomText style={styles.label}>Routine:</CustomText>
+        <CustomText style={styles.value}>{isRoutine ? "Yes" : "No"}</CustomText>
+      </CustomView>
 
       {isRoutine && repeatType && (
-        <View style={styles.section}>
-          <Text style={styles.label}>Repeat Type:</Text>
-          <Text style={styles.value}>{repeatType}</Text>
-        </View>
+        <CustomView style={styles.section}>
+          <CustomText style={styles.label}>Repeat Type:</CustomText>
+          <CustomText style={styles.value}>{repeatType}</CustomText>
+        </CustomView>
       )}
 
       {weekRepeat && weekRepeat.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.label}>Week Repeat:</Text>
-          <Text style={styles.value}>
+        <CustomView style={styles.section}>
+          <CustomText style={styles.label}>Week Repeat:</CustomText>
+          <CustomText style={styles.value}>
             {weekRepeat.map((d) => d).join(", ")}
-          </Text>
-        </View>
+          </CustomText>
+        </CustomView>
       )}
 
       {monthRepeat && monthRepeat.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.label}>Month Repeat:</Text>
-          <Text style={styles.value}>
+        <CustomView style={styles.section}>
+          <CustomText style={styles.label}>Month Repeat:</CustomText>
+          <CustomText style={styles.value}>
             {monthRepeat.map((d) => d).join(", ")}
-          </Text>
-        </View>
+          </CustomText>
+        </CustomView>
       )}
 
       {(startTime != null || endTime != null) && (
-        <View style={styles.section}>
+        <CustomView style={styles.section}>
           {startTime != null && (
             <>
-              <Text style={styles.label}>Start Time:</Text>
-              <Text style={styles.value}>{formatMinutesToAMPM(startTime)}</Text>
+              <CustomText style={styles.label}>Start Time:</CustomText>
+              <CustomText style={styles.value}>
+                {formatMinutesToAMPM(startTime)}
+              </CustomText>
             </>
           )}
           {endTime != null && (
             <>
-              <Text style={styles.label}>End Time:</Text>
-              <Text style={styles.value}>{formatMinutesToAMPM(endTime)}</Text>
+              <CustomText style={styles.label}>End Time:</CustomText>
+              <CustomText style={styles.value}>
+                {formatMinutesToAMPM(endTime)}
+              </CustomText>
             </>
           )}
-        </View>
+        </CustomView>
       )}
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Status:</Text>
-        <Text style={styles.value}>
+      <CustomView style={styles.section}>
+        <CustomText style={styles.label}>Status:</CustomText>
+        <CustomText style={styles.value}>
           {isActive ? "Active" : "Inactive"} | {isDone ? "Done" : "Pending"} |{" "}
           {isArchived ? "Archived" : "Not Archived"} |{" "}
           {isOnFocus ? "Focused" : "Not Focused"}
-        </Text>
-      </View>
-    </ScrollView>
+        </CustomText>
+      </CustomView>
+    </CustomView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: {},
   section: { marginBottom: 16 },
   label: { fontWeight: "bold", fontSize: 16, marginBottom: 4 },
-  value: { fontSize: 16, color: "#333" },
+  value: { fontSize: 16 },
 });
 
 export default TaskDetailScreen;
