@@ -6,6 +6,13 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         tabBarShowLabel: false, // hide text
+        tabBarStyle: {
+          height: 100, // increase from default (usually ~50)
+          paddingBottom: 10, // optional, adjusts icon spacing
+        },
+        tabBarIconStyle: {
+          height: 60,
+        },
       }}
     >
       <Tabs.Screen
