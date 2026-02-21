@@ -1,20 +1,26 @@
 import { View, Text, Switch, StyleSheet } from "react-native";
-import { useCallback, useState } from "react";
-import BottomNav, { getCurrentTab } from "@/Components/bottomNav";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useState } from "react";
+import BottomNav from "@/Components/bottomNav";
+import { useRouter } from "expo-router";
+import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
+
+type Tab = "Home" | "AllTasks" | "Settings";
 
 const SettingsScreen = () => {
   const [isDark, setIsDark] = useState(false);
-  const currentTab = getCurrentTab();
+  const globalNavState = getglobalNavState();
+  const [currentTab, setCurrentTab] = useState<Tab>(globalNavState);
   const router = useRouter();
 
-  useFocusEffect(
-    useCallback(() => {
-      if (currentTab == "Home" || currentTab == "AllTasks") {
-        router.back();
-      }
-    }, [currentTab]),
-  );
+  const handleTabChange = (tab: Tab) => {
+    setCurrentTab(tab);
+
+    if (tab === "Home") router.push("./");
+    if (tab === "AllTasks") router.push("./");
+    // if (tab === "Settings") router.push("./settings");
+    setglobalNavState(tab);
+  };
+
   return (
     <View
       style={{
@@ -29,17 +35,15 @@ const SettingsScreen = () => {
         </Text>
         <Switch value={isDark} onValueChange={setIsDark} />
       </View>
-      <BottomNav />
+
+      <BottomNav activeTab={currentTab} onChange={handleTabChange} />
     </View>
   );
 };
 
+export default SettingsScreen;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "flex-start",
-  },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -49,5 +53,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default SettingsScreen;
