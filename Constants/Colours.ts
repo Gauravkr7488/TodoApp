@@ -43,7 +43,7 @@ export const lightThemeColors = {
   // Primary & Accents (kept consistent)
   primary: "#2563EB", // blue-600
   secondary: "#10B981", // emerald-500
-  accent: "", // amber-500
+  accent: "#3b8cd9ff", // amber-500
 
   // Status Colors
   success: "#2E7D32",
