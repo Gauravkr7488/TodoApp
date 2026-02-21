@@ -107,7 +107,7 @@ export default function taskListScreen() {
                 borderColor: theme.border,
               }}
             >
-              <Pressable
+              {/* <Pressable
                 style={{ flex: 1 }}
                 onPress={() => {
                   router.push({
@@ -123,11 +123,11 @@ export default function taskListScreen() {
                     });
                   }
                 }}
-              >
-                <CustomText style={[styles.item, item.isDone && styles.done]}>
-                  {item.name}
-                </CustomText>
-              </Pressable>
+              > */}
+              <CustomText style={[styles.item, item.isDone && styles.done]}>
+                {item.name}
+              </CustomText>
+              {/* </Pressable> */}
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
