@@ -3,23 +3,19 @@ import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { Checkbox, FAB } from "react-native-paper";
+import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { Checkbox, FAB, MD3DarkTheme, MD3LightTheme } from "react-native-paper";
 import { Db } from "../../db/db";
 import ClearButton from "@/Components/clearButton";
 import AddButton from "@/Components/addButton";
-
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
+import AppText from "../../Components/text";
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-
+  const { isDark } = useTheme();
+  const theme = isDark ? darkThemeColors : lightThemeColors;
   useEffect(() => {
     // creating db for new install
     const init = async () => {
@@ -92,6 +88,7 @@ export default function Index() {
       style={{
         flex: 1,
         padding: 16,
+        backgroundColor: theme.background,
       }}
     >
       <View
@@ -112,7 +109,8 @@ export default function Index() {
                 padding: 5,
                 justifyContent: "space-between",
                 borderBottomWidth: 1,
-                borderColor: "#ddd",
+                // borderColor: "#ddd",
+                borderColor: theme.border,
               }}
             >
               <Pressable
@@ -132,9 +130,9 @@ export default function Index() {
                   }
                 }}
               >
-                <Text style={[styles.item, item.isDone && styles.done]}>
+                <AppText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
-                </Text>
+                </AppText>
               </Pressable>
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
@@ -143,7 +141,7 @@ export default function Index() {
             </View>
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>No tasks yet. Add one!</Text>
+            <AppText style={styles.empty}>No tasks yet. Add one!</AppText>
           }
         />
         <ClearButton
