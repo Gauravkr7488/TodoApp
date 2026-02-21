@@ -1,14 +1,8 @@
-import { STRINGS } from "@/Constants/strings";
-import { Tab, Task } from "@/Constants/type";
+import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
-import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useState
-} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -23,16 +17,7 @@ import { Db } from "../../db/db";
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const homeFilter = [
-    STRINGS.active,
-    STRINGS.all,
-    STRINGS.routine,
-    STRINGS.onfocus,
-  ];
-  const [activeTab, setActiveTab] = useState(STRINGS.active);
 
-  const globalNavState = getglobalNavState();
-  const [currentTab, setCurrentTab] = useState<Tab>(globalNavState);
   useEffect(() => {
     // creating db for new install
     const init = async () => {
@@ -47,7 +32,7 @@ export default function Index() {
         await refreshTasks();
       };
       run();
-    }, [currentTab]),
+    }, []),
   );
 
   const clearCompleted = async () => {
@@ -74,48 +59,12 @@ export default function Index() {
 
   const refreshTasks = async () => {
     // entry point of tasks
-    let rows: Task[] = [];
     await toggleRoutines();
 
-    if (currentTab == "Home") {
-      let rows = await Dal.getAllActiveTasks();
-      rows = rows.filter((row) => row.isArchived !== true); // only not archived
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
-
-    // if (currentTab == "AllTasks") {
-    //   rows = await Dal.getUnarchivedTasks();
-    //   rows = rows.filter((row) => row.isArchived !== true);
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
-
-    if (currentTab == "Settings") {
-      router.push("./SettingsScreen");
-      setglobalNavState(currentTab);
-      setCurrentTab("Home");
-    }
-
-    if (currentTab == "AllTasks") {
-      router.push("./taskListScreen");
-      setglobalNavState(currentTab);
-      setCurrentTab("AllTasks");
-    }
-
-    // if (activeTab == STRINGS.routine) {
-    //   rows = await Dal.getAllTodayRoutines();
-    //   rows = rows.filter((row) => row.isArchived !== true);
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
-
-    // if (activeTab == STRINGS.onfocus) {
-    //   rows = await Dal.getFocusedTasks();
-    //   rows = rows.filter((row) => row.isArchived !== true);
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
+    let rows = await Dal.getAllActiveTasks();
+    rows = rows.filter((row) => row.isArchived !== true); // only not archived
+    const sorted = sortDoneTasks(rows);
+    setTasks(sorted);
   };
 
   const handleReset = () => {
@@ -146,17 +95,8 @@ export default function Index() {
       <View
         style={{
           flex: 1,
-          // padding: 16,
-          // paddingBottom: 60
         }}
       >
-        {/* <Tabs
-          tabs={homeFilter}
-          activeTab={activeTab}
-          onChange={async (value) => {
-            setActiveTab(value);
-          }}
-        /> */}
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.id.toString()}
@@ -198,10 +138,6 @@ export default function Index() {
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
               />
-              {/* <CrispCheckbox
-              checked={item.isDone}
-              onPress={() => handleCheckToggle(item)}
-            /> */}
             </View>
           )}
           ListEmptyComponent={
@@ -219,15 +155,10 @@ export default function Index() {
         <FAB
           icon="plus"
           label="Add"
-          onPress={() => router.push("./Add_tasks")}
+          onPress={() => router.push("/Screens/Add_tasks")}
           style={styles.fab}
-          // disabled={!dbReady} // prevent pressing before DB ready
         />
       </View>
-      {/* <BottomNav
-        activeTab={currentTab}
-        onChange={(tab) => setCurrentTab(tab)}
-      /> */}
     </View>
   );
 }
@@ -252,7 +183,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     bottom: 16,
-    backgroundColor: "#7ec598ff",
+    // backgroundColor: "#7ec598ff",
   },
   row: {
     flexDirection: "row",
@@ -260,6 +191,6 @@ const styles = StyleSheet.create({
   },
   done: {
     textDecorationLine: "line-through",
-    color: "#999",
+    // color: "#999",
   },
 });
