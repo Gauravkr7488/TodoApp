@@ -43,6 +43,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="taskListScreen"
         options={{
+          title: "All Tasks",
+
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "list" : "list-outline"}
@@ -56,6 +58,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="SettingsScreen"
         options={{
+          title: "Settings",
+
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "settings" : "settings-outline"}
