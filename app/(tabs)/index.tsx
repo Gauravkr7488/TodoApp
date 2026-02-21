@@ -1,16 +1,17 @@
+import AddButton from "@/Components/addButton";
+import ClearButton from "@/Components/clearButton";
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
-import { Checkbox, FAB, MD3DarkTheme, MD3LightTheme } from "react-native-paper";
+import { Alert, FlatList, Pressable, StyleSheet } from "react-native";
+import { Checkbox } from "react-native-paper";
+import CustomText from "../../Components/text";
 import { Db } from "../../db/db";
-import ClearButton from "@/Components/clearButton";
-import AddButton from "@/Components/addButton";
-import { useTheme } from "@/Components/ThemeContext";
-import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
-import AppText from "../../Components/text";
+import CustomView from "@/Components/view";
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -84,14 +85,13 @@ export default function Index() {
   };
 
   return (
-    <View
+    <CustomView
       style={{
         flex: 1,
         padding: 16,
-        backgroundColor: theme.background,
       }}
     >
-      <View
+      <CustomView
         style={{
           flex: 1,
         }}
@@ -101,7 +101,7 @@ export default function Index() {
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View
+            <CustomView
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -129,18 +129,18 @@ export default function Index() {
                   }
                 }}
               >
-                <AppText style={[styles.item, item.isDone && styles.done]}>
+                <CustomText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
-                </AppText>
+                </CustomText>
               </Pressable>
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
               />
-            </View>
+            </CustomView>
           )}
           ListEmptyComponent={
-            <AppText style={styles.empty}>No tasks yet. Add one!</AppText>
+            <CustomText style={styles.empty}>No tasks yet. Add one!</CustomText>
           }
         />
         <ClearButton
@@ -148,8 +148,8 @@ export default function Index() {
           onLongPress={handleReset}
         />
         <AddButton onPress={() => router.push("/Screens/Add_tasks")} />
-      </View>
-    </View>
+      </CustomView>
+    </CustomView>
   );
 }
 

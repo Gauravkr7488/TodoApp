@@ -1,16 +1,16 @@
-import { Tab, Task } from "@/Constants/type";
+import AddButton from "@/Components/addButton";
+import ClearButton from "@/Components/clearButton";
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
+import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
-import { Checkbox, FAB } from "react-native-paper";
+import { Checkbox } from "react-native-paper";
+import CustomText from "../../Components/text";
 import { Db } from "../../db/db";
-import ClearButton from "@/Components/clearButton";
-import AddButton from "@/Components/addButton";
-import AppText from "../../Components/text";
-import { useTheme } from "@/Components/ThemeContext";
-import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 
 export default function taskListScreen() {
   const router = useRouter();
@@ -124,9 +124,9 @@ export default function taskListScreen() {
                   }
                 }}
               >
-                <AppText style={[styles.item, item.isDone && styles.done]}>
+                <CustomText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
-                </AppText>
+                </CustomText>
               </Pressable>
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
@@ -135,7 +135,7 @@ export default function taskListScreen() {
             </View>
           )}
           ListEmptyComponent={
-            <AppText style={styles.empty}>No tasks yet. Add one!</AppText>
+            <CustomText style={styles.empty}>No tasks yet. Add one!</CustomText>
           }
         />
         <ClearButton
