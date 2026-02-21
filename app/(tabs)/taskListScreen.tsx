@@ -3,23 +3,21 @@ import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
 import { Db } from "../../db/db";
 import ClearButton from "@/Components/clearButton";
 import AddButton from "@/Components/addButton";
+import AppText from "../../Components/text";
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 
 export default function taskListScreen() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const { isDark } = useTheme();
+  const theme = isDark ? darkThemeColors : lightThemeColors;
   useFocusEffect(
     useCallback(() => {
       const run = async () => {
@@ -85,6 +83,7 @@ export default function taskListScreen() {
       style={{
         flex: 1,
         padding: 16,
+        backgroundColor: theme.background,
       }}
     >
       <View
@@ -105,7 +104,7 @@ export default function taskListScreen() {
                 padding: 5,
                 justifyContent: "space-between",
                 borderBottomWidth: 1,
-                borderColor: "#ddd",
+                borderColor: theme.border,
               }}
             >
               <Pressable
@@ -125,9 +124,9 @@ export default function taskListScreen() {
                   }
                 }}
               >
-                <Text style={[styles.item, item.isDone && styles.done]}>
+                <AppText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
-                </Text>
+                </AppText>
               </Pressable>
               <Checkbox
                 status={item.isDone ? "checked" : "unchecked"}
@@ -136,7 +135,7 @@ export default function taskListScreen() {
             </View>
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>No tasks yet. Add one!</Text>
+            <AppText style={styles.empty}>No tasks yet. Add one!</AppText>
           }
         />
         <ClearButton

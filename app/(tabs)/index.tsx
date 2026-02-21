@@ -109,7 +109,6 @@ export default function Index() {
                 padding: 5,
                 justifyContent: "space-between",
                 borderBottomWidth: 1,
-                // borderColor: "#ddd",
                 borderColor: theme.border,
               }}
             >
