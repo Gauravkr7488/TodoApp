@@ -1,13 +1,8 @@
-import { STRINGS } from "@/Constants/strings";
 import { Tab, Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
-import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, {
-  useCallback,
-  useState
-} from "react";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -22,10 +17,6 @@ import { Db } from "../../db/db";
 export default function taskListScreen() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [activeTab, setActiveTab] = useState(STRINGS.active);
-
-  const globalNavState = getglobalNavState();
-  const [currentTab, setCurrentTab] = useState<Tab>(globalNavState);
 
   useFocusEffect(
     useCallback(() => {
@@ -33,7 +24,7 @@ export default function taskListScreen() {
         await refreshTasks();
       };
       run();
-    }, [currentTab]),
+    }, []),
   );
 
   const clearCompleted = async () => {
@@ -63,49 +54,10 @@ export default function taskListScreen() {
     let rows: Task[] = [];
     await toggleRoutines();
 
-    // if (currentTab == "Home") {
-    //   let rows = await Dal.getAllActiveTasks();
-    //   rows = rows.filter((row) => row.isArchived !== true); // only not archived
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
-
-    if (currentTab == "AllTasks") {
-      rows = await Dal.getUnarchivedTasks();
-      rows = rows.filter((row) => row.isArchived !== true);
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
-
-    if (currentTab == "Settings") {
-      router.push("./SettingsScreen");
-      setglobalNavState(currentTab);
-      setCurrentTab("AllTasks");
-    }
-    if (currentTab == "Home") {
-      router.push("./");
-      setglobalNavState(currentTab);
-      setCurrentTab("AllTasks");
-    }
-    // if (currentTab == "Settings") {
-    //   router.push("/SettingsScreen");
-    //   setglobalNavState(currentTab);
-    //   setCurrentTab("Home");
-    // }
-
-    // if (activeTab == STRINGS.routine) {
-    //   rows = await Dal.getAllTodayRoutines();
-    //   rows = rows.filter((row) => row.isArchived !== true);
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
-
-    // if (activeTab == STRINGS.onfocus) {
-    //   rows = await Dal.getFocusedTasks();
-    //   rows = rows.filter((row) => row.isArchived !== true);
-    //   const sorted = sortDoneTasks(rows);
-    //   setTasks(sorted);
-    // }
+    rows = await Dal.getUnarchivedTasks();
+    rows = rows.filter((row) => row.isArchived !== true);
+    const sorted = sortDoneTasks(rows);
+    setTasks(sorted);
   };
 
   const handleReset = () => {
@@ -195,7 +147,7 @@ export default function taskListScreen() {
         <FAB
           icon="plus"
           label="Add"
-          onPress={() => router.push("./Add_tasks")}
+          onPress={() => router.replace("/Screens/Add_tasks")}
           style={styles.fab}
         />
       </View>

@@ -127,7 +127,7 @@ const Add_tasks = () => {
       );
     }
 
-    router.back();
+    router.replace("/(tabs)");
   };
 
   const toggleDay = (day: string) => {
