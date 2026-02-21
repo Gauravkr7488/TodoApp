@@ -236,7 +236,7 @@ const Add_tasks = () => {
         />
       </CustomView>
 
-      {isRoutine && (
+      {/* {isRoutine && (
         <>
           <CustomView style={styles.chipRow}>
             <Chip
@@ -299,7 +299,7 @@ const Add_tasks = () => {
             }}
           />
         </>
-      )}
+      )} */}
       {/* <CustomView style={styles.switchRow}>
         <CustomText>Active</CustomText>
         <Switch value={isActive} onValueChange={setIsActive} />
