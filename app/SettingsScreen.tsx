@@ -26,11 +26,11 @@ const SettingsScreen = () => {
       style={{
         flex: 1,
         padding: 16,
-        backgroundColor: isDark ? "#121212" : "#ffffff",
+        // backgroundColor: isDark ? "#121212" : "#ffffff",
       }}
     >
       <View style={styles.row}>
-        <Text style={[styles.label, { color: isDark ? "#fff" : "#000" }]}>
+        <Text>
           Dark Mode
         </Text>
         <Switch value={isDark} onValueChange={setIsDark} />
