@@ -16,7 +16,7 @@ const SettingsScreen = () => {
     setCurrentTab(tab);
 
     if (tab === "Home") router.push("./");
-    if (tab === "AllTasks") router.push("./");
+    if (tab === "AllTasks") router.push("./taskListScreen");
     // if (tab === "Settings") router.push("./settings");
     setglobalNavState(tab);
   };
