@@ -19,6 +19,7 @@ const AppWithTheme = () => {
             color: theme.textPrimary,
           },
           headerBackVisible: false,
+          animation: "none",
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
