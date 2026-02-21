@@ -158,6 +158,7 @@ export default function Index() {
               }}
             >
               <Pressable
+              style={{flex: 1}}
                 onPress={() => {
                   router.push({
                     pathname: "/detailViewScreen",
