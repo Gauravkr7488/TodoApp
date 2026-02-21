@@ -12,6 +12,7 @@ import { Checkbox } from "react-native-paper";
 import CustomText from "../../Components/text";
 import { Db } from "../../db/db";
 import CustomView from "@/Components/view";
+import CustomCheckBox from "@/Components/check";
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -130,10 +131,10 @@ export default function Index() {
                 }}
               >
               <CustomText style={[styles.item, item.isDone && styles.done]}>
-                {item.name}
-              </CustomText>
+                  {item.name}
+                </CustomText>
               </Pressable>
-              <Checkbox
+              <CustomCheckBox
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
               />
