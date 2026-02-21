@@ -9,7 +9,7 @@ export class Db {
       "change",
       async (nextAppState: AppStateStatus) => {
         if (nextAppState === "active") {
-          this.db = await this.openDb();
+          this.db = await this.getDB();
         }
       },
     );
