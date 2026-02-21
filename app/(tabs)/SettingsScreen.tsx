@@ -1,6 +1,5 @@
 import { View, Text, Switch, StyleSheet } from "react-native";
 import { useState } from "react";
-import BottomNav from "@/Components/bottomNav";
 import { useRouter } from "expo-router";
 import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
 
@@ -36,7 +35,6 @@ const SettingsScreen = () => {
         <Switch value={isDark} onValueChange={setIsDark} />
       </View>
 
-      <BottomNav activeTab={currentTab} onChange={handleTabChange} />
     </View>
   );
 };

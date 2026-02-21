@@ -15,8 +15,8 @@ import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, View } from "react-native";
 import { Chip, FAB, TextInput } from "react-native-paper";
-import TimePicker from "../Components/dateTimePicker";
-import HeaderMenu from "../Components/menu";
+import TimePicker from "../../Components/dateTimePicker";
+import HeaderMenu from "../../Components/menu";
 
 const Add_tasks = () => {
   const router = useRouter();

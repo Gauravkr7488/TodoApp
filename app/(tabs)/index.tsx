@@ -2,12 +2,12 @@ import { STRINGS } from "@/Constants/strings";
 import { Tab, Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
-import { useFocusEffect, useNavigation, useRouter } from "expo-router";
+import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, {
   useCallback,
   useEffect,
-  useLayoutEffect,
-  useState,
+  useState
 } from "react";
 import {
   Alert,
@@ -18,9 +18,7 @@ import {
   View,
 } from "react-native";
 import { Checkbox, FAB } from "react-native-paper";
-import BottomNav from "../Components/bottomNav";
-import { Db } from "../db/db";
-import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
+import { Db } from "../../db/db";
 
 export default function Index() {
   const router = useRouter();
@@ -94,7 +92,7 @@ export default function Index() {
     // }
 
     if (currentTab == "Settings") {
-      router.push("/SettingsScreen");
+      router.push("./SettingsScreen");
       setglobalNavState(currentTab);
       setCurrentTab("Home");
     }
@@ -179,14 +177,14 @@ export default function Index() {
                 style={{ flex: 1 }}
                 onPress={() => {
                   router.push({
-                    pathname: "/detailViewScreen",
+                    pathname: "/Screens/detailViewScreen",
                     params: { id: item.id },
                   });
                 }}
                 onLongPress={() => {
                   if (!item.isDone) {
                     router.push({
-                      pathname: "/Add_tasks",
+                      pathname: "/Screens/Add_tasks",
                       params: { id: item.id },
                     });
                   }
@@ -226,10 +224,10 @@ export default function Index() {
           // disabled={!dbReady} // prevent pressing before DB ready
         />
       </View>
-      <BottomNav
+      {/* <BottomNav
         activeTab={currentTab}
         onChange={(tab) => setCurrentTab(tab)}
-      />
+      /> */}
     </View>
   );
 }
