@@ -11,6 +11,8 @@ export default function TabsLayout() {
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.background,
+          borderBottomWidth: 2,
+          borderBottomColor: theme.border,
         },
         headerTintColor: theme.textPrimary,
         tabBarShowLabel: false, // hide text
@@ -22,7 +24,6 @@ export default function TabsLayout() {
         tabBarIconStyle: {
           height: 60,
         },
-        // tabBarInactiveTintColor: "#9CA3AF",
       }}
     >
       <Tabs.Screen
