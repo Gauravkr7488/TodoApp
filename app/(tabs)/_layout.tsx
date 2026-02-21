@@ -1,12 +1,51 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabsLayout() {
   return (
-    <Tabs>
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="taskListScreen" options={{ title: "All Tasks" }} />
-      <Tabs.Screen name="SettingsScreen" options={{ title: "Settings" }} />
+    <Tabs
+      screenOptions={{
+        tabBarShowLabel: false, // hide text
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="taskListScreen"
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "list" : "list-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="SettingsScreen"
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
