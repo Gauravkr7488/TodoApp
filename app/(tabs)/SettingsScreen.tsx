@@ -1,40 +1,15 @@
-import { View, Text, Switch, StyleSheet } from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
-import { getglobalNavState, setglobalNavState } from "@/fun/NavState";
-
-type Tab = "Home" | "AllTasks" | "Settings";
+import { StyleSheet, Switch, Text, View } from "react-native";
+import { useTheme } from "../../Components/ThemeContext";
 
 const SettingsScreen = () => {
-  const [isDark, setIsDark] = useState(false);
-  const globalNavState = getglobalNavState();
-  const [currentTab, setCurrentTab] = useState<Tab>(globalNavState);
-  const router = useRouter();
-
-  const handleTabChange = (tab: Tab) => {
-    setCurrentTab(tab);
-
-    if (tab === "Home") router.push("./");
-    if (tab === "AllTasks") router.push("./taskListScreen");
-    // if (tab === "Settings") router.push("./settings");
-    setglobalNavState(tab);
-  };
+  const { isDark, toggleDark } = useTheme();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 16,
-        // backgroundColor: isDark ? "#121212" : "#ffffff",
-      }}
-    >
+    <View style={{ flex: 1, padding: 16 }}>
       <View style={styles.row}>
-        <Text>
-          Dark Mode
-        </Text>
-        <Switch value={isDark} onValueChange={setIsDark} />
+        <Text style={styles.label}>Dark Mode</Text>
+        <Switch value={isDark} onValueChange={toggleDark} />
       </View>
-
     </View>
   );
 };
