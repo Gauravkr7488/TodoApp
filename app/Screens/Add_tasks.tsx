@@ -212,14 +212,12 @@ const Add_tasks = () => {
             padding: 10,
             margin: 10,
             borderRadius: 10,
-            backgroundColor: "#f2f2f2",
           }}
         >
           <CustomText
             style={{
               fontSize: 16,
               fontWeight: "300",
-              color: "#333",
             }}
           >
             Created at - {creationDate}
