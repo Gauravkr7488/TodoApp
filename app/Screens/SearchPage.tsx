@@ -71,7 +71,7 @@ export default function TaskPage() {
           <View style={styles.row}>
             <Pressable
               onPress={() =>
-                router.push({ pathname: "/Add_tasks", params: { id: item.id } })
+                router.replace({ pathname: "/Screens/Add_tasks", params: { id: item.id } })
               }
             >
               <Text style={[styles.item, item.doneStatus && styles.done]}>

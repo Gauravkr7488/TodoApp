@@ -108,3 +108,5 @@ type MenuItem = {
 export type HeaderMenuProps = {
   items: MenuItem[];
 };
+
+export type Tab = "Home" | "AllTasks" | "Settings";

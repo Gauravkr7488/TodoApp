@@ -1,11 +1,15 @@
+import CustomText from "@/Components/text";
+import { useTheme } from "@/Components/ThemeContext";
+import CustomView from "@/Components/view";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 import { WEEKDAY } from "@/Constants/strings";
 import {
-    MinutesSinceMidnight,
-    MonthDay,
-    RepeatType,
-    toRepeatType,
-    toWeekDay,
-    WeekDay,
+  MinutesSinceMidnight,
+  MonthDay,
+  RepeatType,
+  toRepeatType,
+  toWeekDay,
+  WeekDay,
 } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { Db } from "@/db/db";
@@ -13,11 +17,12 @@ import { formatMinutesToAMPM, toDDMMYYYY, toMinutes } from "@/db/utils";
 import { useNavigation, useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, Switch, Text, View } from "react-native";
-import { Chip, FAB, TextInput } from "react-native-paper";
-import TimePicker from "../Components/dateTimePicker";
-import HeaderMenu from "../Components/menu";
-
+import { Alert, StyleSheet, Switch } from "react-native";
+import { Chip, FAB } from "react-native-paper";
+import TimePicker from "../../Components/dateTimePicker";
+import HeaderMenu from "../../Components/menu";
+import CustomTextInput from "@/Components/textInput";
+import { Ionicons } from "@expo/vector-icons";
 const Add_tasks = () => {
   const router = useRouter();
   const params = useSearchParams();
@@ -45,6 +50,10 @@ const Add_tasks = () => {
   const inputRef = useRef<any>(null);
   const [isRoutine, setIsRoutine] = useState(false);
   const navigation = useNavigation();
+  //
+
+  const { isDark } = useTheme();
+  const theme = isDark ? darkThemeColors : lightThemeColors;
 
   useEffect(() => {
     (async () => {
@@ -127,7 +136,7 @@ const Add_tasks = () => {
       );
     }
 
-    router.back();
+    router.replace("/(tabs)");
   };
 
   const toggleDay = (day: string) => {
@@ -178,8 +187,8 @@ const Add_tasks = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
+    <CustomView style={{ flex: 1, padding: 16 }}>
+      <CustomTextInput
         label="Name"
         mode="outlined"
         ref={inputRef}
@@ -187,7 +196,7 @@ const Add_tasks = () => {
         onChangeText={setName}
         style={styles.input}
       />
-      <TextInput
+      <CustomTextInput
         label="Description"
         mode="outlined"
         value={description}
@@ -197,40 +206,39 @@ const Add_tasks = () => {
         numberOfLines={5}
         textAlignVertical="top"
       />
-      {id && (
-        <View
+      {/* {id && (
+        <CustomView
           style={{
             padding: 10,
             margin: 10,
             borderRadius: 10,
-            backgroundColor: "#f2f2f2",
           }}
         >
-          <Text
+          <CustomText
             style={{
               fontSize: 16,
               fontWeight: "300",
-              color: "#333",
             }}
           >
             Created at - {creationDate}
-          </Text>
-        </View>
-      )}
-      <View style={styles.switchRow}>
-        <Text>Is Routine</Text>
+          </CustomText>
+        </CustomView>
+      )} */}
+      <CustomView style={styles.switchRow}>
+        <CustomText>Repeate</CustomText>
         <Switch
           value={isRoutine}
           onValueChange={(value) => {
             setIsRoutine(value);
-            setRepeatType(value ? toRepeatType("daily") : null);
+            // setRepeatType(value ? toRepeatType("daily") : null);
+            setRepeatType(toRepeatType("daily"));
           }}
         />
-      </View>
+      </CustomView>
 
-      {isRoutine && (
+      {/* {isRoutine && (
         <>
-          <View style={styles.chipRow}>
+          <CustomView style={styles.chipRow}>
             <Chip
               selected={repeatType === "daily"}
               onPress={() => setRepeatType(toRepeatType("daily"))}
@@ -246,9 +254,9 @@ const Add_tasks = () => {
             >
               Weekly
             </Chip>
-          </View>
+          </CustomView>
           {repeatType === "weekly" && (
-            <View style={styles.chipRow}>
+            <CustomView style={styles.chipRow}>
               {Object.values(WEEKDAY).map((day) => (
                 <Chip
                   key={day}
@@ -258,7 +266,7 @@ const Add_tasks = () => {
                   {day}
                 </Chip>
               ))}
-            </View>
+            </CustomView>
           )}
           <TimePicker
             labelProp="Start Time"
@@ -291,22 +299,21 @@ const Add_tasks = () => {
             }}
           />
         </>
-      )}
-      <View style={styles.switchRow}>
-        <Text>Active</Text>
+      )} */}
+      {/* <CustomView style={styles.switchRow}>
+        <CustomText>Active</CustomText>
         <Switch value={isActive} onValueChange={setIsActive} />
-      </View>
-      <View style={styles.switchRow}>
-        <Text>Is Archived</Text>
+      </CustomView> */}
+      {/* <CustomView style={styles.switchRow}>
+        <CustomText>Is Archived</CustomText>
         <Switch value={isArchived} onValueChange={setIsArcived} />
-      </View>
-      <View style={styles.switchRow}>
-        <Text>Is Focused</Text>
+      </CustomView>
+      <CustomView style={styles.switchRow}>
+        <CustomText>Is Focused</CustomText>
         <Switch value={isOnFocus} onValueChange={setIsOnFocus} />
-      </View>
+      </CustomView> */}
       <FAB
-        icon="content-save"
-        label="Save"
+        icon={() => <Ionicons name="save" size={24} />}
         onPress={async () => {
           let isDuplicate;
           if (!id) {
@@ -325,26 +332,26 @@ const Add_tasks = () => {
           }
           await saveTask();
         }}
-        style={styles.fab}
+        style={{
+          position: "absolute",
+          right: 32,
+          bottom: 40,
+          backgroundColor: theme.accent,
+        }}
+        color={theme.accent}
       />
-    </View>
+    </CustomView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: {},
   input: { marginBottom: 12 },
   switchRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
-  },
-  fab: {
-    position: "absolute",
-    right: 16,
-    bottom: 16,
-    backgroundColor: "#22c55e",
   },
   chipRow: {
     flexDirection: "row",

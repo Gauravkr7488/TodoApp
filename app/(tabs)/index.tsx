@@ -1,34 +1,23 @@
-import { STRINGS } from "@/Constants/strings";
+import AddButton from "@/Components/addButton";
+import ClearButton from "@/Components/clearButton";
+import { useTheme } from "@/Components/ThemeContext";
+import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
 import { Task } from "@/Constants/type";
 import { Dal } from "@/db/DAL";
 import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { Checkbox, FAB } from "react-native-paper";
-import BottomNav from "../Components/bottomNav";
-import { Db } from "../db/db";
-
+import { Alert, FlatList, Pressable, StyleSheet } from "react-native";
+import { Checkbox } from "react-native-paper";
+import CustomText from "../../Components/text";
+import { Db } from "../../db/db";
+import CustomView from "@/Components/view";
+import CustomCheckBox from "@/Components/check";
 export default function Index() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const homeFilter = [
-    STRINGS.active,
-    STRINGS.all,
-    STRINGS.routine,
-    STRINGS.onfocus,
-  ];
-  const [activeTab, setActiveTab] = useState(STRINGS.active);
-  const [currentTab, setCurrentTab] = useState<
-    "Home" | "AllTasks" | "Settings"
-  >("Home");
+  const { isDark } = useTheme();
+  const theme = isDark ? darkThemeColors : lightThemeColors;
   useEffect(() => {
     // creating db for new install
     const init = async () => {
@@ -43,11 +32,12 @@ export default function Index() {
         await refreshTasks();
       };
       run();
-    }, [currentTab]),
+    }, []),
   );
 
   const clearCompleted = async () => {
-    await Db.archiveCompletedTasks();
+    // await Db.archiveCompletedTasks();
+    await Db.deleteCompletedTasks();
     await refreshTasks();
   };
 
@@ -70,36 +60,15 @@ export default function Index() {
 
   const refreshTasks = async () => {
     // entry point of tasks
-    let rows: Task[] = [];
     await toggleRoutines();
 
-    if (currentTab == "Home") {
-      let rows = await Dal.getAllActiveTasks();
-      rows = rows.filter((row) => row.isArchived !== true); // only not archived
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
+    let rows = await Dal.getAllActiveTasks();
+    let rowsb = await Dal.getAllTodayRoutines();
+    let c = [...rows, ...rowsb];
+    rows = rows.filter((c) => c.isArchived !== true); // only not archived
 
-    if (currentTab == "AllTasks") {
-      rows = await Dal.getUnarchivedTasks();
-      rows = rows.filter((row) => row.isArchived !== true);
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
-
-    if (activeTab == STRINGS.routine) {
-      rows = await Dal.getAllTodayRoutines();
-      rows = rows.filter((row) => row.isArchived !== true);
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
-
-    if (activeTab == STRINGS.onfocus) {
-      rows = await Dal.getFocusedTasks();
-      rows = rows.filter((row) => row.isArchived !== true);
-      const sorted = sortDoneTasks(rows);
-      setTasks(sorted);
-    }
+    const sorted = sortDoneTasks(rows);
+    setTasks(sorted);
   };
 
   const handleReset = () => {
@@ -121,32 +90,23 @@ export default function Index() {
   };
 
   return (
-    <View
+    <CustomView
       style={{
         flex: 1,
         padding: 16,
       }}
     >
-      <View
+      <CustomView
         style={{
           flex: 1,
-          // padding: 16,
-          // paddingBottom: 60
         }}
       >
-        {/* <Tabs
-          tabs={homeFilter}
-          activeTab={activeTab}
-          onChange={async (value) => {
-            setActiveTab(value);
-          }}
-        /> */}
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View
+            <CustomView
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -154,65 +114,47 @@ export default function Index() {
                 padding: 5,
                 justifyContent: "space-between",
                 borderBottomWidth: 1,
-                borderColor: "#ddd",
+                borderColor: theme.border,
               }}
             >
               <Pressable
-              style={{flex: 1}}
-                onPress={() => {
-                  router.push({
-                    pathname: "/detailViewScreen",
-                    params: { id: item.id },
-                  });
-                }}
+                style={{ flex: 1 }}
+                // onPress={() => {
+                //   router.push({
+                //     pathname: "/Screens/detailViewScreen",
+                //     params: { id: item.id },
+                //   });
+                // }}
                 onLongPress={() => {
                   if (!item.isDone) {
                     router.push({
-                      pathname: "/Add_tasks",
+                      pathname: "/Screens/Add_tasks",
                       params: { id: item.id },
                     });
                   }
                 }}
               >
-                <Text style={[styles.item, item.isDone && styles.done]}>
+                <CustomText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
-                </Text>
+                </CustomText>
               </Pressable>
-              <Checkbox
+              <CustomCheckBox
                 status={item.isDone ? "checked" : "unchecked"}
                 onPress={() => handleCheckToggle(item)}
               />
-              {/* <CrispCheckbox
-              checked={item.isDone}
-              onPress={() => handleCheckToggle(item)}
-            /> */}
-            </View>
+            </CustomView>
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>No tasks yet. Add one!</Text>
+            <CustomText style={styles.empty}>No tasks yet. Add one!</CustomText>
           }
         />
-        <FAB
-          icon="delete"
-          label="Clear"
+        <ClearButton
           onPress={async () => await clearCompleted()}
           onLongPress={handleReset}
-          style={[styles.fab, { bottom: 80 }]}
-          // disabled={!dbReady}
         />
-        <FAB
-          icon="plus"
-          label="Add"
-          onPress={() => router.push("./Add_tasks")}
-          style={styles.fab}
-          // disabled={!dbReady} // prevent pressing before DB ready
-        />
-      </View>
-      <BottomNav
-        activeTab={currentTab}
-        onChange={(tab) => setCurrentTab(tab)}
-      />
-    </View>
+        <AddButton onPress={() => router.push("/Screens/Add_tasks")} />
+      </CustomView>
+    </CustomView>
   );
 }
 
@@ -236,7 +178,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     bottom: 16,
-    backgroundColor: "#7ec598ff",
+    // backgroundColor: "#7ec598ff",
   },
   row: {
     flexDirection: "row",
@@ -244,6 +186,6 @@ const styles = StyleSheet.create({
   },
   done: {
     textDecorationLine: "line-through",
-    color: "#999",
+    // color: "#999",
   },
 });
