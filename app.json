@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "todoapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    // "newArchEnabled": true,
     // "jsEngine": "hermes",
     "jsEngine": "jsc",
     "ios": {
