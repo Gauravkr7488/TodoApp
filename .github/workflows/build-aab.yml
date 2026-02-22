@@ -41,7 +41,7 @@ jobs:
           -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -deststorepass ${{ secrets.KEYSTORE_PASSWORD }}
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: MyApp
           path: android/app/build/outputs/bundle/release/app-release.aab
