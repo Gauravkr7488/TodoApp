@@ -16,10 +16,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Increase Node memory
-        run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
-
-      - run: npm install
+      - run: npm ci
 
       - uses: actions/setup-java@v4
         with:
@@ -36,7 +33,7 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/android/app/release.keystore
 
       - name: Make AAB
-        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2 --stacktrace
+        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           KEYSTORE_PATH: ${{ github.workspace }}/android/app/release.keystore
