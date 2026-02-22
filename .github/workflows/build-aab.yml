@@ -18,14 +18,28 @@ jobs:
 
       - run: npm ci
 
-      - run: npx expo prebuild --platform android --non-interactive
+      - name: Increase Node memory
+        run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
+
+      - run: npx expo prebuild --platform android --non-interactive --clean
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - run: cd android && ./gradlew bundleRelease --no-daemon --scan
+      - name: make AAB  
+        run: cd android && ./gradlew bundleRelease --no-daemon --stacktrace
+
+
+
+      - name: Sign AAB
+        run: |
+          keytool -importkeystore -srckeystore ${{ secrets.KEYSTORE }} \
+          -destkeystore ${{ secrets.DEST_KEYSTORE }} \
+          -srcstoretype JKS -deststoretype JKS \
+          -srcalias aliasName -destalias aliasName \
+          -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -deststorepass ${{ secrets.KEYSTORE_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         with:
