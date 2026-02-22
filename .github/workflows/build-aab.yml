@@ -16,7 +16,7 @@ jobs:
           node-version: 18
           cache: npm
 
-      - run: npm ci
+      - run: npm install
 
       - name: Increase Node memory
         run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
@@ -29,7 +29,7 @@ jobs:
           java-version: 17
 
       - name: make AAB  
-        run: cd android && ./gradlew bundleRelease --no-daemon --stacktrace
+        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2 --info
 
 
 
