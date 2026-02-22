@@ -16,38 +16,42 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm install
-
       - name: Increase Node memory
         run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
-      - run: npx expo prebuild --platform android --non-interactive --clean
+      - run: npm install
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Test JS bundle directly
-        run: npx react-native bundle \
-              --platform android \
-              --dev false \
-              --entry-file index.js \
-              --bundle-output test.bundle \
-              --assets-dest test
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: make AAB  
-        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2 --debug
+      - run: npx expo prebuild --platform android --non-interactive --clean
 
-
-
-      - name: Sign AAB
+      - name: Test JS bundle
         run: |
-          keytool -importkeystore -srckeystore ${{ secrets.KEYSTORE }} \
-          -destkeystore ${{ secrets.DEST_KEYSTORE }} \
-          -srcstoretype JKS -deststoretype JKS \
-          -srcalias aliasName -destalias aliasName \
-          -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -deststorepass ${{ secrets.KEYSTORE_PASSWORD }}
+          mkdir -p $GITHUB_WORKSPACE/test
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output $GITHUB_WORKSPACE/test.bundle \
+            --assets-dest $GITHUB_WORKSPACE/test
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/android/app/release.keystore
+
+      - name: Make AAB
+        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/android/app/release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         with:
