@@ -54,8 +54,7 @@ export default function taskListScreen() {
     let rows: Task[] = [];
     await toggleRoutines();
 
-    rows = await Dal.getUnarchivedTasks();
-    rows = rows.filter((row) => row.isArchived !== true);
+    rows = await Dal.getFilteredTasks();
     const sorted = sortDoneTasks(rows);
     setTasks(sorted);
   };
@@ -124,14 +123,10 @@ export default function taskListScreen() {
                   }
                 }}
               >
-              <CustomText style={[styles.item, item.isDone && styles.done]}>
-                {item.name}
-              </CustomText>
+                <CustomText style={[styles.item, item.isDone && styles.done]}>
+                  {item.name}
+                </CustomText>
               </Pressable>
-              <Checkbox
-                status={item.isDone ? "checked" : "unchecked"}
-                onPress={() => handleCheckToggle(item)}
-              />
             </View>
           )}
           ListEmptyComponent={

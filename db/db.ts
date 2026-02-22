@@ -189,15 +189,11 @@ export class Db {
   protected static async getUnarchivedRows() {
     const db = await this.getDB();
 
-    try {
-      return await db.getAllAsync<TaskRow>(
-        `SELECT *
+    return await db.getAllAsync<TaskRow>(
+      `SELECT *
        FROM TASKS
        WHERE isArchived = 0`,
-      );
-    } catch (error: unknown) {
-      console.log(error);
-    }
+    );
   }
 
   protected static async getTask(id: number) {
@@ -343,5 +339,12 @@ export class Db {
     );
     if (result.length > 0) return true;
     return false;
+  }
+
+  public static async deleteCompletedTasks() {
+    const db = await this.getDB();
+    return db.runAsync(`
+      DELETE FROM TASKS WHERE isDone = 1 AND repeatType IS NULL
+      `);
   }
 }

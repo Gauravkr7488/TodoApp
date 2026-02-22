@@ -36,7 +36,8 @@ export default function Index() {
   );
 
   const clearCompleted = async () => {
-    await Db.archiveCompletedTasks();
+    // await Db.archiveCompletedTasks();
+    await Db.deleteCompletedTasks();
     await refreshTasks();
   };
 
@@ -62,7 +63,10 @@ export default function Index() {
     await toggleRoutines();
 
     let rows = await Dal.getAllActiveTasks();
-    rows = rows.filter((row) => row.isArchived !== true); // only not archived
+    let rowsb = await Dal.getAllTodayRoutines();
+    let c = [...rows, ...rowsb];
+    rows = rows.filter((c) => c.isArchived !== true); // only not archived
+
     const sorted = sortDoneTasks(rows);
     setTasks(sorted);
   };
@@ -130,7 +134,7 @@ export default function Index() {
                   }
                 }}
               >
-              <CustomText style={[styles.item, item.isDone && styles.done]}>
+                <CustomText style={[styles.item, item.isDone && styles.done]}>
                   {item.name}
                 </CustomText>
               </Pressable>
