@@ -38,6 +38,7 @@ jobs:
       - name: Make AAB
         run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           KEYSTORE_PATH: ${{ github.workspace }}/android/app/release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
