@@ -28,8 +28,16 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Test JS bundle directly
+        run: npx react-native bundle \
+              --platform android \
+              --dev false \
+              --entry-file index.js \
+              --bundle-output test.bundle \
+              --assets-dest test
+
       - name: make AAB  
-        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2 --info
+        run: cd android && ./gradlew bundleRelease --no-daemon --max-workers=2 --debug
 
 
 
