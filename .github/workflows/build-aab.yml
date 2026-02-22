@@ -24,8 +24,8 @@ jobs:
       - name: Install Expo CLI
         run: npm install -g expo-cli
 
-      - name: Prebuild Expo App
-        run: expo prebuild --platform android
+      # - name: Prebuild Expo App
+      #   run: expo prebuild --platform android
 
       - name: Set up JDK
         uses: actions/setup-java@v2
