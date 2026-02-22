@@ -37,6 +37,7 @@
           androidSdk.androidsdk
           pkgs.nodejs_20
           pkgs.google-chrome
+          pkgs.eas-cli
         ];
 
         ANDROID_HOME = "${androidSdk.androidsdk}/libexec/android-sdk";
