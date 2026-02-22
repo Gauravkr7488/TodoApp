@@ -16,6 +16,14 @@
     },
     "production": {
       "autoIncrement": true
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
     }
   },
   "submit": {
