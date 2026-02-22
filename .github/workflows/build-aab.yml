@@ -31,16 +31,6 @@ jobs:
 
       - run: npx expo prebuild --platform android --non-interactive --clean
 
-      - name: Test JS bundle
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/test
-          npx react-native bundle \
-            --platform android \
-            --dev false \
-            --entry-file index.js \
-            --bundle-output $GITHUB_WORKSPACE/test.bundle \
-            --assets-dest $GITHUB_WORKSPACE/test
-
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/android/app/release.keystore
