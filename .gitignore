@@ -42,3 +42,6 @@ app-example
 /ios
 my-release-key.keystore
 my-release-key.keystore.base64
+
+# stuff
+/android
