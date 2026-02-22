@@ -1,7 +1,7 @@
-import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/Components/ThemeContext";
 import { darkThemeColors, lightThemeColors } from "@/Constants/Colours";
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 export default function TabsLayout() {
@@ -49,7 +49,7 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="taskListScreen"
+        name="TaskListScreen"
         options={{
           title: "All Tasks",
 

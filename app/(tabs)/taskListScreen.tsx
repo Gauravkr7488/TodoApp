@@ -8,11 +8,10 @@ import { toggleRoutines } from "@/db/routines";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
-import { Checkbox } from "react-native-paper";
 import CustomText from "../../Components/text";
 import { Db } from "../../db/db";
 
-export default function taskListScreen() {
+export default function TaskListScreen() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
 
