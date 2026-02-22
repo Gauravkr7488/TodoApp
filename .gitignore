@@ -40,6 +40,5 @@ app-example
 
 # generated native folders
 /ios
-/android
 my-release-key.keystore
 my-release-key.keystore.base64
