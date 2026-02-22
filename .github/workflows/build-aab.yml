@@ -10,44 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Setup Java
-        uses: actions/setup-java@v3
+          node-version: '14'
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Prebuild Expo App
+        run: expo prebuild
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'
-          java-version: '17'
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-      
-      - name: Decode Keystore
+          java-version: '11'
+
+      - name: Build Android App
+        run: cd android && ./gradlew bundleRelease
+
+      - name: Sign AAB
         run: |
-          mkdir -p android/app && echo "${{ secrets.KEYSTROKE }}" | base64 -d > android/app/release.keystore
-      
-      - name: Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file=app/release.keystore \
-            -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" \
-            -Pandroid.injected.signing.key.alias="${{ secrets.KEY_ALIAS }}" \
-            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
-      
+          keytool -importkeystore -srckeystore ${{ secrets.KEYSTORE }} \
+          -destkeystore ${{ secrets.DEST_KEYSTORE }} \
+          -srcstoretype JKS -deststoretype JKS \
+          -srcalias aliasName -destalias aliasName \
+          -srcstorepass ${{ secrets.KEYSTORE_PASSWORD }} -deststorepass ${{ secrets.KEYSTORE_PASSWORD }}
+
       - name: Upload AAB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
-          name: release-aab
+          name: MyApp
           path: android/app/build/outputs/bundle/release/app-release.aab
-      
-      - name: Cleanup Keystore
-        if: always()
-        run: rm -f android/app/release.keystore
